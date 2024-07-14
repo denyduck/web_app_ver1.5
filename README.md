@@ -35,7 +35,7 @@ ffewwef1
 > > - dalsi polozka
 > > - dalsi polozka   
 >
-> #vetsi nadpis
+> # vetsi nadpis
 > > 1. takze polo
 > > 2. item
 > > 3. item
