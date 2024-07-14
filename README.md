@@ -40,4 +40,4 @@ ffewwef1
 > > 2. item
 > > 3. item
 
-* my best browser is [duckduckgo](htttps://duckduckgo.com)
+my best browser is [duckduckgo](htttps://duckduckgo.com)
