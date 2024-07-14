@@ -2,7 +2,17 @@
 
 **Projekt se zabývá vytvořením šablon serverové části kodu webových aplikací pro budoucí nasazení v komerčním použíti. Vytvoří se několik verzí projektu od nejméně složitého jako běžná webová aplikace po složitější kterou bude webový magazín nebo eshopové řešení. Každá verze bude uložena jako šablona, tak aby byla samostatně použitelná.**
 
-## Cíle 
+## Cíle
+
+Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, přičemž každy krok zahrnuje vytvoření jednotlivých částí systému tak i dokumentaci k šabloně. Tento přístup má několik specifických cílů:
+
+1. Učení a porozumění
+3. Modularita
+4. Přehledná dokumentace
+5. Praktická zkušnost
+6. Flexibilita
+7. 
+
 ## Struktura projektu
 - [Frontend](#frontend)
 - [Backend](#backend)
