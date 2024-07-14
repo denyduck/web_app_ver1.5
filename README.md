@@ -7,12 +7,18 @@
 Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, přičemž každy krok zahrnuje jak vytvoření jednotlivých částí systému tak i dokumentaci k šabloně. Tento přístup má několik specifických cílů:
 
 ### Dílčí cíle:
+
 #### Učení a porozumění
-- pochopit a implementovat různé aspekty backendových aplikací.
-3. [Modularita]
-4. Přehledná dokumentace
+- Pochopit a implementovat různé aspekty backendových aplikací.
+#### Modularita
+- Vytvářet komoponenty, které mohou být snadno rozšířeny nebo opakovaně použity v různých projektech
+#### Přehledná dokumentace
+- Usnadnit navigaci a porozmění každému kroku v projektu
+- udržování čitelnosti a přehlednosti
+- Vytvářet jasnou a přehlednou dokumentaci
 5. Praktická zkušnost
-6. Flexibilita 
+#### Flexibilita
+- rozšiřování a upraveni podle kontkrétnách potřeb
 
 ## Struktura projektu
 - [Frontend](#frontend)
