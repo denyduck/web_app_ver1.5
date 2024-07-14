@@ -4,7 +4,7 @@
 
 ## Cíle 
 ## Struktura projektu
-- [Frontend](frontend.md)
+- [Frontend](#frontend)
 - [Backend](#backend)
 - [Database](#database)
 - [API](#api)
@@ -13,6 +13,9 @@
 - [Docker Nasazení](#docker-nasazeni)
 - [GitHub](#github)
 - [Návrh tříd a diagramy](#navrh-trid-a-diagramy)
+
+## Frontend
+## 
 ## webapp
 ### webapp
 #### web app
