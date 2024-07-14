@@ -2,7 +2,17 @@
 
 **Projekt se zabývá vytvořením šablon serverové části kodu webových aplikací pro budoucí nasazení v komerčním použíti. Vytvoří se několik verzí projektu od nejméně složitého jako běžná webová aplikace po složitější kterou bude webový magazín nebo eshopové řešení. Každá verze bude uložena jako šablona, tak aby byla samostatně použitelná.**
 
-### My great Heading {# custom-id}
+## Cíle 
+## Struktura projektu
+- [Frontend](#frontend)
+- [Backend](#backend)
+- [Database](#database)
+- [API](#api)
+- [Backup](#backup)
+- [Testování](#testovani)
+- [Docker Nasazení](#docker-nasazeni)
+- [GitHub](#github)
+- [Návrh tříd a diagramy](#navrh-trid-a-diagramy)
 ## webapp
 ### webapp
 #### web app
