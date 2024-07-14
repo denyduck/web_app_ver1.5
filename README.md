@@ -4,9 +4,9 @@
 
 ## Cíle
 
-Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, přičemž každy krok zahrnuje vytvoření jednotlivých částí systému tak i dokumentaci k šabloně. Tento přístup má několik specifických cílů:
+Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, přičemž každy krok zahrnuje jak vytvoření jednotlivých částí systému tak i dokumentaci k šabloně. Tento přístup má několik specifických cílů:
 
-> 1. Učení a porozumění
+> * Učení a porozumění
 > 3. Modularita
 > 4. Přehledná dokumentace
 > 5. Praktická zkušnost
