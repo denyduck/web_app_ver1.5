@@ -5,7 +5,6 @@
 ## Cíle 
 ## Struktura projektu
 - [Frontend](frontend.md)
-- [Frontend](#frontend)
 - [Backend](#backend)
 - [Database](#database)
 - [API](#api)
@@ -18,7 +17,7 @@
 ### webapp
 #### web app
 ##### web app
-
+## Api
 **tohle je tucne**
 
 >nejaky block
