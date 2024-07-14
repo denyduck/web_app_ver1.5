@@ -9,7 +9,7 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 ### Dílčí cíle:
 1. Učení a porozumění
    
-3. Modularita
+3. [Modularita]
 4. Přehledná dokumentace
 5. Praktická zkušnost
 6. Flexibilita 
