@@ -4,7 +4,7 @@
 
 ## Cíle 
 ## Struktura projektu
-- [Frontend](#/frontend.md)
+- [Frontend](frontend.md)
 - [Frontend](#frontend)
 - [Backend](#backend)
 - [Database](#database)
