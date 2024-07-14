@@ -1,6 +1,6 @@
 # WEBAPP TEMPLATES
 
-** Projekt se zabývá vytvořením šablon serverové části kodu webových aplikací pro budoucí nasazení v komerčním použíti. Vytvoří se několik verzí projektu od nejméně složitého jako běžná webová aplikace po složitější kterou bude webový magazín nebo eshopové řešení. Každá verze bude uložena jako šablona, tak aby byla samostatně použitelná.**
+**Projekt se zabývá vytvořením šablon serverové části kodu webových aplikací pro budoucí nasazení v komerčním použíti. Vytvoří se několik verzí projektu od nejméně složitého jako běžná webová aplikace po složitější kterou bude webový magazín nebo eshopové řešení. Každá verze bude uložena jako šablona, tak aby byla samostatně použitelná.**
 
 ### My great Heading {# custom-id}
 ## webapp
