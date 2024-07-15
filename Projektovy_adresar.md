@@ -3,7 +3,6 @@
 - my_project/
   - docs/
     - Projektovy_adresar.md
-      ---
   - app/
     - routes/
   - run.py
@@ -12,3 +11,5 @@
   - README.md
   - .gitignore
   - requirements.txt
+
+---
