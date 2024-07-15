@@ -11,6 +11,3 @@
   - README.md
   - .gitignore
   - requirements.txt
-
----
-| --
