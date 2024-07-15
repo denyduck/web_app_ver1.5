@@ -2,7 +2,7 @@
 
 - my_project/
   - app/
-  -   - routes
+    - routes/
   - run.py
   - .venv/
   - .git/
