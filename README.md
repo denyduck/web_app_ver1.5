@@ -32,9 +32,3 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 - [Docker Nasazení](#docker-nasazeni)
 - [GitHub](#github)
 - [Návrh tříd a diagramy](#navrh-trid-a-diagramy)
-
-
-
-my best browser is [duckduckgo](htttps://duckduckgo.com)
-My favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").
-
