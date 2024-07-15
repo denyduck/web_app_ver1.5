@@ -21,6 +21,7 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 - rozšiřování a upraveni podle kontkrétnách potřeb
 
 ## Struktura projektu
+- [Projektový adresář](Projektový adresář.md)
 - [Frontend](#frontend)
 - [Backend](#backend)
 - [Database](#database)
