@@ -27,6 +27,7 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 ## Struktura projektu
 
 - [Git, GIThub](#GIT)
+- [Docker, nasazení aplikace ](#DOCKER)
 - [Projektový adresář](Projektovy_adresar.md)
 - [Frontend](#frontend)
 - [Backend](#backend)
@@ -34,7 +35,7 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 - [API](#api)
 - [Backup](#backup)
 - [Testování](#testovani)
-- [Docker Nasazení](#docker-nasazeni)
+
 - [GitHub](#github)
 - [Návrh tříd a diagramy](#navrh-trid-a-diagramy)
 
@@ -47,6 +48,14 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 > 2. develop - vývojřská větev, která zahrnuje celky
 > 3. funkce develop - poddružná větev DEVELOPu pro vývoj jednotlivých funkcí, metod
 
+
+## DOCKER
+
+### dockerfile
+Aplikace se nasazuje v kontejneru s dalšími zavislostmi, které jsou pro běh serveru nutné. Samotná aplikace bude konfigurovaní v souboru dockerfile. Zahrnuje napřiklad instalaci všech *requirements, app path, verze balíčků atd*
+
+### docker-compose.yml
+Pro nasazení vytvořeného předsloženého *image* z dockerfile se vytvoří spouštěcí script docker-compose.yml. Ten nasazuje samotne kontejnery do jedné aplikace, které mezi sebou z manageruje. 
 
 
 
