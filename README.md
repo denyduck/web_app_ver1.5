@@ -41,8 +41,7 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 
 ## GIT
 
-- projekt bude versován na Github.
-- použije se několik větví:
+Projekt je versován na Github do třech základních větví. Pracuje se s hlavní větví, ve které je vždy funkční kod a funguje jako poslední záloha projektu. Vedlejší větev *develop* je vývojová, kde probíhá hlavní vývoj. Poslední podružná větev pracuje na nejnižší úrovni jako ne například funkce nebo metoda. Název větve bude vždy odvozen od úkolu fce nebo metody.
 
 > 1. main - hlavní větev
 > 2. develop - vývojřská větev, která zahrnuje celky
@@ -54,8 +53,13 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 ### dockerfile
 Aplikace se nasazuje v kontejneru s dalšími zavislostmi, které jsou pro běh serveru nutné. Samotná aplikace bude konfigurovaní v souboru dockerfile. Zahrnuje napřiklad instalaci všech *requirements, app path, verze balíčků atd*
 
+### docker-file
+
+'''Dockerfile
+'''
+
 ### docker-compose.yml
-Pro nasazení vytvořeného předsloženého *image* z dockerfile se vytvoří spouštěcí script docker-compose.yml. Ten nasazuje samotne kontejnery do jedné aplikace, které mezi sebou z manageruje. 
+Pro nasazení vytvořeného předsloženého *image* z dockerfile se vytvoří spouštěcí script docker-compose.yml. Ten nasazuje samotne kontejnery do jedné aplikace. Kontejnery mezi sebou komunikují. 
 
 
 
