@@ -26,7 +26,7 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 
 ## Struktura projektu
 
-- [Git, GIThub](#versovani)
+- [Git, GIThub](#GIT)
 - [Projektový adresář](Projektovy_adresar.md)
 - [Frontend](#frontend)
 - [Backend](#backend)
@@ -41,10 +41,12 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 ## GIT
 
 - projekt bude versován na Github.
-- použije se několik větví
-	* main
-< vždy funkční část kodu
-	* develop
-< vývojová část/skupina
-	* <název podle funkce>
-< jednotlivé funkce
+- použije se několik větví:
+
+> 1. main - hlavní větev
+> 2. develop - vývojřská větev, která zahrnuje celky
+> 3. funkce develop - poddružná větev DEVELOPu pro vývoj jednotlivých funkcí, metod
+
+
+
+
