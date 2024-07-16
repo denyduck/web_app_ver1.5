@@ -56,6 +56,8 @@ Aplikace se nasazuje v kontejneru s dalšími zavislostmi, které jsou pro běh 
 ### docker-file
 
 '''Dockerfile
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim
 '''
 
 ### docker-compose.yml
