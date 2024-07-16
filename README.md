@@ -37,3 +37,14 @@ Cílem tohoto projektu je postupně vybudovat komplexní backendovou aplikaci, p
 - [Docker Nasazení](#docker-nasazeni)
 - [GitHub](#github)
 - [Návrh tříd a diagramy](#navrh-trid-a-diagramy)
+
+## GIT
+
+- projekt bude versován na Github.
+- použije se několik větví
+	* main
+< vždy funkční část kodu
+	* develop
+< vývojová část/skupina
+	* <název podle funkce>
+< jednotlivé funkce
