@@ -55,10 +55,10 @@ Aplikace se nasazuje v kontejneru s dalšími zavislostmi, které jsou pro běh 
 
 ### docker-file
 
-'''Dockerfile
+´´´ Dockerfile
 # Use an official Python runtime as a parent image
 FROM python:3.8-slim
-'''
+´´´
 
 ### docker-compose.yml
 Pro nasazení vytvořeného předsloženého *image* z dockerfile se vytvoří spouštěcí script docker-compose.yml. Ten nasazuje samotne kontejnery do jedné aplikace. Kontejnery mezi sebou komunikují. 
