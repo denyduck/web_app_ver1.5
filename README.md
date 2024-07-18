@@ -50,19 +50,24 @@ Projekt je versován na Github do třech základních větví. Pracuje se s hlav
 
 ## DOCKER
 
+Pro běh aplikce, bude využito podpůrných a periferních balíčků. Budou zpracovány do jednotlivých "mikroslužeb - kontejnerů". Každý takový, např. MariaDb, Ubuntu, Ngingx,.. bude mít v adresářové struktuře samostatný adresář umístěný v kořenovém adresáři aplikce.
+Bude obsahovat samotný soubor Dockerfile, config služby plus další soubory aplikace.
+Rozdělení do jednotlivých mikroslužeb přináší složitější definice pro orchestraci kontejnerů, tedy pro jejich vzájemnou komunikaci. Přináší však výhody v robustnosti systému, jejich nezávislost na sobě, jednodušší správu z pohledu jejich definic, upgradů, atd.
+
 ### dockerfile
 Aplikace se nasazuje v kontejneru s dalšími zavislostmi, které jsou pro běh serveru nutné. Samotná aplikace bude konfigurovaní v souboru dockerfile. Zahrnuje napřiklad instalaci všech *requirements, app path, verze balíčků atd*
 
+#### Dockerfile
+
 ```
-# Use an official Python runtime as a parent image
-FROM python:3.8-slim
+# Use an official ubuntu server
+FROM python:
 
 # Set the working directory in the container
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
 COPY . /app
-
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -82,4 +87,26 @@ Pro nasazení vytvořeného předsloženého *image* z dockerfile se vytvoří s
 ```
 # 
 ```
+
+## Adresářová struktura
+
+webapp/
+  |- app/
+    |- runn.py
+    |- Dockerfile
+  |- nginx/
+    |- nginx.conf
+    |- Dockerfile
+  |- mysql/
+    |- Dockerfile
+  |- adminer/
+    |- Dockerfile
+    |- config
+  |- docker-compose.yml
+  |- README.md
+  .venv
+  .gitignore
+  .git
+
+## Backend
 
