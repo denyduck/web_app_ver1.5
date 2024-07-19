@@ -8,12 +8,12 @@ FROM python:latest
 WORKDIR usr/src/app
 
 # zkopirovani souboru v umisteni dockerfile do pracovniho adresare
-COPY . . 
+COPY requirement.txt 
 
-# instalace závistlostí z requirements.txt
-RUN pip install -r requirements
+# instalace závistlostí z requirements.txt, cache nebude ukládána (ušetří místo v kontejnerech a na serveru
+RUN pip install --no-cache-dir -r requirements.txt
 
 # spuštění aplikace
-# spusti python s hodnou runn.py
-CMD ["python", "runn.py"]
+# spusti python s hodnou run.py
+CMD ["python", "run.py"]
 
