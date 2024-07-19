@@ -1,2 +1,16 @@
-version: '3'
+version: '3.8' #verze docker enginu
+
+
 services:
+
+  web:           # název služby
+    build:       # specifikace pro sestaveni obrazu
+      context: ./app       # adresář, kde Docker hledá Dockerfile a ostantí soubory
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"  # mapuje porty mezi hostem a kontejnerem
+    volumes:
+      - .app:/usr/src/app # mapuje místní adresář ./app do kontejneru 
+    enviroment:
+      FLASK_APP: run.py  # aplikace flask po spusteni bude hledat souštěcí soubor aplikace: app.py
+      FLASK_RUN_HOST: 0.0.0.0    # pro přístuponost kontejneru pro ostatní

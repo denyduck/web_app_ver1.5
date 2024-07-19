@@ -94,6 +94,7 @@ webapp/
   |- app/
     |- runn.py
     |- Dockerfile
+    |- requirements.txt
   |- nginx/
     |- nginx.conf
     |- Dockerfile
