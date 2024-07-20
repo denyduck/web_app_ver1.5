@@ -1,1 +1,9 @@
-test/
+#Přidání všch ignorovaných souborů a adresářů
+
+
+
+# vývojové prostředí
+venv/
+
+# konfigurační soubor od Pycharm
+.idea/
