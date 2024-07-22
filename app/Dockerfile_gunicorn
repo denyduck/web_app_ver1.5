@@ -1,0 +1,17 @@
+# Používáme oficiální Python image jako základ
+FROM python:3.9-slim
+
+# Nastavuji pracovní adresář
+WORKDIR /usr/src/app
+
+# Kopíruji soubor s požadavky
+COPY requirements.txt ./
+
+# Instalace závislostí
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Kopíruji ostatní soubory
+COPY . .
+
+# Spuštění Gunicorn serveru
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"]

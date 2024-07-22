@@ -48,6 +48,9 @@ Projekt je versován na Github do třech základních větví. Pracuje se s hlav
 > 3. funkce develop - poddružná větev DEVELOPu pro vývoj jednotlivých funkcí, metod
 
 
+## GUNICORN
+
+
 ## DOCKER
 
 Pro běh aplikce, bude využito podpůrných a periferních balíčků. Budou zpracovány do jednotlivých "mikroslužeb - kontejnerů". Každý takový, např. MariaDb, Ubuntu, Ngingx,.. bude mít v adresářové struktuře samostatný adresář umístěný v kořenovém adresáři aplikce.
@@ -57,36 +60,10 @@ Rozdělení do jednotlivých mikroslužeb přináší složitější definice pr
 ### dockerfile
 Aplikace se nasazuje v kontejneru s dalšími zavislostmi, které jsou pro běh serveru nutné. Samotná aplikace bude konfigurovaní v souboru dockerfile. Zahrnuje napřiklad instalaci všech *requirements, app path, verze balíčků atd*
 
-#### Dockerfile
-
-```
-# Use an official ubuntu server
-FROM python:
-
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY . /app
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Make port 80 available to the world outside this container
-EXPOSE 80
-
-# Define environment variable
-ENV NAME World
-
-# Run app.py when the container launches
-CMD ["python", "app.py"]
-```
-
 ### docker-compose.yml
 Pro nasazení vytvořeného předsloženého *image* z dockerfile se vytvoří spouštěcí script docker-compose.yml. Ten nasazuje samotne kontejnery do jedné aplikace. Kontejnery mezi sebou komunikují. 
 
-```
-# 
-```
+
 
 ## Adresářová struktura
 

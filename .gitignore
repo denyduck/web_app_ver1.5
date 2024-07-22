@@ -7,3 +7,6 @@ venv/
 
 # konfigurační soubor od Pycharm
 .idea/
+
+# zkompilovaný bytcode soubory Pythonu, které jsou generovány automaticky aby urychlili načítání modulů
+__pycache__/

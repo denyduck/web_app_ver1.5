@@ -1,16 +1,40 @@
-  version: '3.8' #verze docker enginu
+version: '3.8'  # Verze Docker Compose
 
-  services:
-    
-    web:  # název služby
-      container_name: web_flask # název kontejneru
-      build:  # specifikace pro sestaveni obrazu
-        context: ./app  # adresář, kde Docker hledá Dockerfile a ostantí soubory
-        dockerfile: Dockerfile
-      ports:
-        - "5000:5000"  # mapuje porty mezi hostem a kontejnerem (přemsměrování z hosta na kontejner)
-      volumes:
-        - ./app:/usr/src/app # mapuje místní adresář ./app do kontejneru
-      environment:
-        FLASK_APP: run.py  # aplikace flask po spusteni bude hledat souštěcí soubor aplikace: app.py
-        FLASK_RUN_HOST: 0.0.0.0    # pro přístuponost kontejneru pro ostatní
+services:
+
+
+  flask:  # Název služby pro Flask aplikaci
+    container_name: web_flask  # Název kontejneru
+    build:  # Specifikace pro sestavení obrazu
+      context: ./app  # Adresář, kde Docker hledá Dockerfile a ostatní soubory
+      dockerfile: Dockerfile_flask  # Název Dockerfile
+    expose:
+      - "5000"  # Interní port pro komunikaci mezi kontejnery
+    volumes:
+      - ./app:/usr/src/app  # Mapování místního adresáře do kontejneru pro případné změny v app ihned odstupné
+    environment:
+      FLASK_APP: run.py  # Flask aplikace bude hledat soubor run.py
+      FLASK_RUN_HOST: 0.0.0.0  # Aplikace bude přístupná zvenčí kontejneru
+
+
+  gunicorn:
+    container_name: gunicorn
+    build:
+      context: ./app
+      dockerfile: Dockerfile_gunicorn
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"] # pro definici nebo úpravu image
+    depends_on:
+      - flask
+
+
+  nginx: # Název
+    container_name: nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80" # host:kontejner (host:kontejner)
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Mapování konf. souboru pro okamžitou platnost
+    depends_on:
+      - gunicorn
