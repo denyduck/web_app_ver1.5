@@ -68,23 +68,24 @@ Pro nasazení vytvořeného předsloženého *image* z dockerfile se vytvoří s
 ## Adresářová struktura
 
 webapp/
-  |- app/
-    |- runn.py
-    |- Dockerfile
-    |- requirements.txt
-  |- nginx/
-    |- nginx.conf
-    |- Dockerfile
-  |- mysql/
-    |- Dockerfile
-  |- adminer/
-    |- Dockerfile
-    |- config
-  |- docker-compose.yml
-  |- README.md
-  .venv
-  .gitignore
-  .git
+  ├── app/
+  │   ├── runn.py
+  │   ├── Dockerfile_flask
+      ├── Dockerfile_gunicorn
+  │   └── requirements.txt
+  ├── nginx/
+  │   ├── nginx.conf
+  │   └── Dockerfile_nginx
+  ├── mysql/
+  │   └── Dockerfile_mysql
+  ├── adminer/
+  │   ├── Dockerfile
+  │   └── config
+  ├── docker-compose.yml
+  ├── README.md
+  ├── .venv
+  ├── .gitignore
+  └── .git
 
 ## Backend
 
