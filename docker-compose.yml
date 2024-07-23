@@ -1,8 +1,6 @@
 version: '3.8'  # Verze Docker Compose
 
 services:
-
-
   flask:  # Název služby pro Flask aplikaci
     container_name: web_flask  # Název kontejneru
     build:  # Specifikace pro sestavení obrazu
@@ -11,62 +9,72 @@ services:
     expose:
       - "5000"  # Interní port pro komunikaci mezi kontejnery
     volumes:
-      - ./app:/usr/src/app  # Mapování místního adresáře do kontejneru pro případné změny v app ihned odstupné
+      - ./app:/usr/src/app  # Mapování místního adresáře do kontejneru
     environment:
       FLASK_APP: run.py  # Flask aplikace bude hledat soubor run.py
       FLASK_RUN_HOST: 0.0.0.0  # Aplikace bude přístupná zvenčí kontejneru
     networks:
-      - my_network # pro komunikaci mezi flaskem a databzi
-
+      - my_network  # Síť, na které bude služba běžet
 
   gunicorn:
-    container_name: gunicorn
+    container_name: gunicorn  # Název kontejneru
     build:
       context: ./app
-      dockerfile: Dockerfile_gunicorn
-    command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"] # pro definici nebo úpravu image
+      dockerfile: Dockerfile_gunicorn  # Název Dockerfile
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"]  # Spouští Gunicorn server na portu 8000
     depends_on:
-      - flask
+      - flask  # Gunicorn závisí na Flask službě
 
-
-  nginx: # Název
-    container_name: nginx
+  nginx:
+    container_name: nginx  # Název kontejneru
     build:
       context: ./nginx
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_nginx  # Název Dockerfile
     ports:
-      - "80:80" # host:kontejner (host:kontejner)
+      - "80:80"  # Mapování portu 80 na hostitelský port 80
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Mapování konf. souboru pro okamžitou platnost
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Mapování konfiguračního souboru Nginx
     depends_on:
-      - gunicorn
+      - gunicorn  # Nginx závisí na Gunicorn službě
 
   db:
     image: mysql:8.0  # Používá oficiální MySQL obraz verze 8.0
-    container_name: mysql
+    container_name: mysql  # Název kontejneru
     environment:
       MYSQL_ROOT_PASSWORD: root_password  # Nastaví heslo pro root uživatele
-      MYSQL_DATABASE: my_database         # Vytvoří novou databázi
-      MYSQL_USER: my_user                 # Vytvoří nového uživatele
-      MYSQL_PASSWORD: my_password         # Nastaví heslo pro nového uživatele
+      MYSQL_DATABASE: my_database  # Vytvoří novou databázi
+      MYSQL_USER: my_user  # Vytvoří nového uživatele
+      MYSQL_PASSWORD: my_password  # Nastaví heslo pro nového uživatele
     ports:
-      - "3306:3306"                       # Mapuje port 3306 na hostitelský port 3306
+      - "3306:3306"  # Mapuje port 3306 na hostitelský port 3306
     volumes:
-      - db_data:/var/lib/mysql            # Persistentní úložiště pro data
+      - db_data:/var/lib/mysql  # Persistentní úložiště pro data
     networks:
-      - my_network                        # Síť, na které bude služba běžet
+      - my_network  # Síť, na které bude služba běžet
 
   adminer:
-    image: adminer
-    container_name: adminer
+    image: adminer  # Používá oficiální Adminer obraz
+    container_name: adminer  # Název kontejneru
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Mapuje port 8080 na hostitelský port 8080
     networks:
-      - my_network
+      - my_network  # Síť, na které bude služba běžet
+
+  mkdocs:
+    image: squidfunk/mkdocs-material  # Používá oficiální Docker obraz pro MkDocs s materiálovým tématem
+    ports:
+      - "8005:8000"  # Mapuje port 8000 v kontejneru na port 8005 na hostitelském systému
+    volumes:
+      - ./:/docs  # Mapuje aktuální adresář na adresář /docs v kontejneru
+    stdin_open: true  # Umožňuje interakci s kontejnerem přes standardní vstup (stdin)
+    tty: true  # Poskytuje pseudo-terminál (tty) pro kontejner
 
 volumes:
-  db_data:                               # Definuje přetrvájící volume ikdyž kontejner nebo images přestane existovat. Definice volume, Docker se postará o jeho vytvoření
-                                         # cd /var/lib/docker/volumes/db_data/_data
+  db_data:  # Definuje persistentní volume pro MySQL databázi
+    # Definice volume, Docker se postará o jeho vytvoření
+    # Data budou uchována i po odstranění kontejneru
+    # cd /var/lib/docker/volumes/db_data/_data
 
 networks:
-  my_network:                            # Definuje síť ke které se mouhou připojovoat ostatní kontejnery
+  my_network:  # Definuje vlastní síť pro komunikaci mezi kontejnery
+    driver: bridge  # Používá výchozí síťový ovladač                     # Definuje síť ke které se mouhou připojovoat ostatní kontejnery
