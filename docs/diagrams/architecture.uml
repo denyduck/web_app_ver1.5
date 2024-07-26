@@ -1,0 +1,43 @@
+@startuml
+package "Architecture" {
+    node "DockerHost" {
+        [web_flask Container] << (D, #FFAAAA) Docker
+        [gunicorn Container] << (D, #FFAAAA) Docker
+        [nginx Container] << (D, #FFAAAA) Docker
+        [mysql Container] << (D, #FFAAAA) Docker
+        [adminer Container] << (D, #FFAAAA) Docker
+        [mkdocs Container] << (D, #FFAAAA) Docker
+
+        [nginx Container] --> [gunicorn Container] : Forwards requests
+        [gunicorn Container] --> [web_flask Container] : Uses for WSGI
+        [web_flask Container] --> [mysql Container] : Reads/Writes data
+        [mysql Container] --> [adminer Container] : Reads/Views data (GUI)
+
+        [mkdocs Container] --> [web_flask Container] : Generates documentation from code
+    }
+
+    package "Docker Configuration" {
+        [Dockerfile for web_flask] << (f, #AAAAFF) Dockerfile : Configures
+        [Dockerfile for gunicorn] << (f, #AAAAFF) Dockerfile : Configures
+        [Dockerfile for nginx] << (f, #AAAAFF) Dockerfile : Configures
+
+        [Dockerfile for web_flask] --> [web_flask Container] : Builds
+        [Dockerfile for gunicorn] --> [gunicorn Container] : Builds
+        [Dockerfile for nginx] --> [nginx Container] : Builds
+
+        [Docker Compose File] << (f, #AAFFAA) Docker Compose : Defines and configures
+
+        [Docker Compose File] --> [nginx Container] : Configures
+        [Docker Compose File] --> [gunicorn Container] : Configures
+        [Docker Compose File] --> [web_flask Container] : Configures
+        [Docker Compose File] --> [mysql Container] : Configures
+        [Docker Compose File] --> [adminer Container] : Configures
+        [Docker Compose File] --> [mkdocs Container] : Configures
+
+    }
+
+    [Docker Image for mysql] --> [mysql Container] : Pulls
+    [Docker Image for adminer] --> [adminer Container] : Pulls
+    [Docker Image for mkdocs] --> [mkdocs Container] : Pulls
+}
+@enduml
