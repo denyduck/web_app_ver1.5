@@ -1,0 +1,26 @@
+# Používám základní Python obraz jako základ pro svůj kontejner
+FROM python:3.9-slim
+
+
+# Nastavuji pracovní adresář v kontejneru
+WORKDIR /usr/src/mkdocs
+
+# Kopíruji soubor s požadavky do pracovního adresáře
+# Tento krok je oddělený, aby se využil cache a ušetřil čas při následných buildách
+COPY requirements_mkdocs.txt ./
+
+# Kopíruj konfigurační soubor MkDocs
+
+# Instalace a upgrade závislostí z requirements.txt
+# Volba --no-cache-dir zajišťuje, že cache nebude uložena, což šetří místo
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements_mkdocs.txt
+# Kopíruji ostatní soubory do pracovního adresáře kontejneru
+COPY . .
+
+
+# Exponuji port, na kterém MkDocs běží
+EXPOSE 8000
+
+# Spouštím MkDocs server
+CMD ["mkdocs", "serve", "--dev-addr", "0.0.0.0:8000"]

@@ -1,9 +1,0 @@
-site_name: Projekt Flask
-
-nav:
-  - Home: README.md
-  - About: about.md
-  - Nastaveni: nastaveni.md
-
-theme:
-  name: 'material'

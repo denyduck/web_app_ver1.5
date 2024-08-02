@@ -1,0 +1,29 @@
+# Název webové stránky
+# Tento název se zobrazuje v záhlaví webové stránky
+site_name: Projekt Flask
+
+# Adresář pro dokumenty
+# Určuje, kde se nacházejí Markdown soubory, které MkDocs použije pro generování webových stránek
+docs_dir: docs
+
+
+# Navigační menu
+# Určuje strukturu a pořadí stránek v navigačním menu
+nav:
+  - Home: README.md
+    # Odkazuje na soubor README.md, který se zobrazuje jako úvodní stránka
+
+  - Architectura aplikace: Docker.md
+    # Odkazuje na soubor Docker.md v podadresáři docs, který obsahuje informace o architektuře aplikace
+
+  - Flask: Flask.md
+  - Database: Databes.md
+  - nginx: Nginx.md
+
+  - Nastaveni: nastaveni.md
+    # Odkazuje na soubor nastaveni.md, který obsahuje informace o nastavení
+
+# Nastavení vzhledu a stylu webové stránky
+theme:
+  name: 'material'
+  # Používá téma Material, které poskytuje moderní a estetický vzhled pro webové stránky

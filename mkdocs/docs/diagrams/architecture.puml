@@ -1,0 +1,58 @@
+# Architektura aplikace
+
+
+@startuml
+package "Architecture" {
+    node "DockerHost" {
+
+
+        [nginx Container] --> [gunicorn Container] : Forwards requests
+        [gunicorn Container] --> [web_flask Container] : Uses for WSGI
+        [web_flask Container] --> [mysql Container] : Reads/Writes data
+        [mysql Container] --> [adminer Container] : Reads/Views data (GUI)
+        [mkdocs Container] --> [web_flask Container] : Reads/Writes docs APP
+
+        note left of [nginx Container]
+          **nginx Container**
+          - Reverse Proxy Server
+          - Handles incoming requests
+          - Forwards requests to Gunicorn
+        end note
+
+        note right of [gunicorn Container]
+          **Gunicorn Container**
+          - WSGI HTTP Server
+          - Runs Python web applications
+          - Handles communication between web server and application
+        end note
+
+        note left of [mkdocs Container]
+          **MkDocs Container** 
+          - Documentation Generator
+          - Generates documentation from the source code of web_flask
+        end note
+
+        note left of [web_flask Container]
+          **Flask Container**
+          - Web Application
+          - Listens on **Port 5000**
+          - Handles web requests and connects to MySQL
+          - Uses cache for performance
+        end note
+
+        note left of [mysql Container]
+          **MySQL Container**
+          - Database Server
+          - Listens on **Port 3306**
+          - Stores application data
+        end note
+
+        note left of [adminer Container]
+          **Adminer Container**
+          - Database Management Interface
+          - Listens on **Port 8080**
+          - Provides GUI for MySQL
+        end note
+    }
+}
+@enduml
