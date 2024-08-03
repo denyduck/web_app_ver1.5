@@ -1,7 +1,20 @@
 # Příručka pro WebAPP
 
 
-## Verze: 1.0
+> ## Verze: 1.0
+> Verze obsahuje tyto aplikace v struktuře:
+
+> 1. Docker - vytvoření image pro kontejnery
+> 2. Docker_compose - konfigurace a nasazení do kontejnerů
+> 2. Git - main, develop
+> 3. Nginx - proxy server (obecné nastavení)
+> 4. Gunicorn - python server (obecné nastavení pro běh aplikace)
+> 5. Flask - jádro aplikace, strukturalizace adresářu
+> 6. Mkdocs - generování příručky
+> 7. Plantuml - server pro generování diagramu z uml kodu
+> 8. adminer - GUI správce databáze
+> 9. MYSQL - databázový server  
+
 ### Obsah aplikace: ###
 **Nginx, Gunicorn, web-flask, mysql, adminer, mkdocs, dockerfile, docker-compose, uml diagramy**  
 

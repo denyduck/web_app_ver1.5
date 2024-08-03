@@ -7,6 +7,7 @@ site_name: Projekt Flask
 docs_dir: docs
 
 
+
 # Navigační menu
 # Určuje strukturu a pořadí stránek v navigačním menu
 nav:
@@ -20,10 +21,14 @@ nav:
   - Database: Databes.md
   - nginx: Nginx.md
 
+  - Koncepce: Koncepce.md
+
   - Nastaveni: nastaveni.md
     # Odkazuje na soubor nastaveni.md, který obsahuje informace o nastavení
 
 # Nastavení vzhledu a stylu webové stránky
 theme:
   name: 'material'
+  palette:
+    primary: indigo
   # Používá téma Material, které poskytuje moderní a estetický vzhled pro webové stránky
