@@ -1,0 +1,1 @@
+Před instalací instalovat req_dev.txt pro developer.

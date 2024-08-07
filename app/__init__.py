@@ -6,15 +6,10 @@ def init_app():
     app.config.from_object("config.Config")
 
 
-
+    # import BP pro jeho registraci
     from app.admin import admin_bp
+    # registrace BP
     app.register_blueprint(admin_bp)
 
-
- #   with app.app_context():
-       # from app.routes import main_bp
-
-        # Import Dash Aplikace
-        #from .plytlydash.dashboard import create_dashboard
 
     return app

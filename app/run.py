@@ -1,8 +1,7 @@
-import logging
 
 from __init__ import init_app
 
-
+# předat celou aplikaci jakou proměnou do app
 app = init_app()
 
 

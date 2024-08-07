@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Flask App</title>
+    <!-- Bootstrap CSS -->
+    <link href="{{ url_for('static', filename='css/vendor/bootstrap.css') }}" rel="stylesheet">
 </head>
 <body>
-<p>Ahoj svete</p>
+    <h1>Hello, Flask with Bootstrap!</h1>
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', filename='js/vendor/bootstrap.bundle.js') }}"></script>
 </body>
 </html>
-
-

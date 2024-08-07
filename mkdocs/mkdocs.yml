@@ -1,12 +1,29 @@
 # Název webové stránky
 # Tento název se zobrazuje v záhlaví webové stránky
-site_name: Projekt Flask
+site_name: Projektová dokumentace - FLASK APP
 
 # Adresář pro dokumenty
 # Určuje, kde se nacházejí Markdown soubory, které MkDocs použije pro generování webových stránek
 docs_dir: docs
 
+# Nastavení vzhledu a stylu webové stránky
+theme:
+  name: 'material'
 
+
+  palette:
+    
+    # Palette toggle for light mode
+    - scheme: default
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 
 # Navigační menu
 # Určuje strukturu a pořadí stránek v navigačním menu
@@ -26,9 +43,5 @@ nav:
   - Nastaveni: nastaveni.md
     # Odkazuje na soubor nastaveni.md, který obsahuje informace o nastavení
 
-# Nastavení vzhledu a stylu webové stránky
-theme:
-  name: 'material'
-  palette:
-    primary: indigo
+
   # Používá téma Material, které poskytuje moderní a estetický vzhled pro webové stránky

@@ -24,7 +24,6 @@ services:
     command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"]  # Příkaz, který spustí Gunicorn server na portu 8000
     depends_on:
       - flask  # Gunicorn závisí na službě `flask`, která musí být spuštěna dříve
-
   nginx:
     container_name: nginx  # Název kontejneru pro Nginx
     build:
