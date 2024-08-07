@@ -8,12 +8,14 @@ WORKDIR /usr/src/app
 # Tento krok je oddělený, aby se využil cache a ušetřil čas při následných buildách
 COPY requirements.txt ./
 
+# Kopíruji ostatní soubory do pracovního adresáře kontejneru
+COPY . .
+
+
 # Instalace závislostí z requirements.txt
 # Volba --no-cache-dir zajišťuje, že cache nebude uložena, což šetří místo
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Kopíruji ostatní soubory do pracovního adresáře kontejneru
-COPY . .
 
 # Spuštění Flask aplikace
 CMD ["python", "run.py"]

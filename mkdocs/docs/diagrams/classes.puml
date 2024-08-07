@@ -1,0 +1,9 @@
+# Organizace Blueprintu aplikace
+
+@startuml
+
+package "Flask Application" {
+
+}
+
+
