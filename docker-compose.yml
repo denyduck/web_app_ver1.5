@@ -1,10 +1,12 @@
 version: '3.8'  # Verze Docker Compose, která specifikuje verzi syntaxe a funkcí, které budou použity
 
 services:
+
+# HLAVNÍ APLIKACE
   flask:  # Název služby, která bude provozovat Flask aplikaci
     container_name: web_flask  # Název kontejneru, který bude vytvořen
     build:  # Definice pro sestavení Docker obrazu
-      context: ./app  # Adresář, ve kterém Docker hledá Dockerfile a další soubory potřebné pro sestavení
+      context: /app  # Adresář, ve kterém Docker hledá Dockerfile a další soubory potřebné pro sestavení
       dockerfile: Dockerfile_flask  # Název Dockerfile, který bude použit pro sestavení obrazu
     expose:
       - "5000"  # Port, na kterém bude aplikace naslouchat uvnitř kontejneru, není přesměrován na hostitelský systém
@@ -16,14 +18,21 @@ services:
     networks:
       - my_network  # Síť, na které bude služba běžet
 
+
+# GUNICORN - PYTHON SERVER
   gunicorn:
     container_name: gunicorn  # Název kontejneru pro Gunicorn server
+    environment:
+      PYTHONPATH: /usr/src:${PYTHONPATH}
     build:
       context: ./app  # Adresář pro sestavení obrazu
       dockerfile: Dockerfile_gunicorn  # Název Dockerfile pro Gunicorn
     command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"]  # Příkaz, který spustí Gunicorn server na portu 8000
     depends_on:
       - flask  # Gunicorn závisí na službě `flask`, která musí být spuštěna dříve
+
+
+# REZERVNÍ PROXY - KOMUNIKAC EMEZI SLUŽBAMA
   nginx:
     container_name: nginx  # Název kontejneru pro Nginx
     build:
@@ -36,6 +45,8 @@ services:
     depends_on:
       - gunicorn  # Nginx závisí na službě `gunicorn`, která musí být spuštěna dříve
 
+
+# DATABAZE
   db:
     image: mysql:8.0  # Použití oficiálního MySQL obrazu verze 8.0
     container_name: mysql  # Název kontejneru pro MySQL
@@ -51,6 +62,8 @@ services:
     networks:
       - my_network  # Síť, na které bude služba běžet
 
+
+# GUI PRO DB
   adminer:
     image: adminer  # Použití oficiálního Adminer obrazu pro správu databází
     container_name: adminer  # Název kontejneru pro Adminer
@@ -59,6 +72,8 @@ services:
     networks:
       - my_network  # Síť, na které bude služba běžet
 
+
+# PŘÍRUČKOVÝ MICROSITE
   mkdocs:
     container_name: mkdocs  # Název kontejneru pro MkDocs
     build:
@@ -75,6 +90,7 @@ services:
       - my_network
 
 
+# SERVER UML - GENERATOR UML
   plantuml:
     image: plantuml/plantuml-server:v1.2024.5
     container_name: plantuml-server

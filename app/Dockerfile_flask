@@ -11,11 +11,12 @@ COPY requirements.txt ./
 # Kopíruji ostatní soubory do pracovního adresáře kontejneru
 COPY . .
 
-
 # Instalace závislostí z requirements.txt
 # Volba --no-cache-dir zajišťuje, že cache nebude uložena, což šetří místo
 RUN pip install --no-cache-dir -r requirements.txt
 
+# proměná prostředí - adresář kde python hledá balíček
+ENV PYTHONPATH="/usr/src:${PYTHONPATH}"
 
 # Spuštění Flask aplikace
 CMD ["python", "run.py"]
