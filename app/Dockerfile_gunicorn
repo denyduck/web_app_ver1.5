@@ -13,5 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Kopíruji ostatní soubory
 COPY . .
 
+# proměná prostředí - adresář kde python hledá balíček
+ENV PYTHONPATH="/usr/src:${PYTHONPATH}"
+
 # Spuštění Gunicorn serveru
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"]

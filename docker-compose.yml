@@ -6,7 +6,7 @@ services:
   flask:  # Název služby, která bude provozovat Flask aplikaci
     container_name: web_flask  # Název kontejneru, který bude vytvořen
     build:  # Definice pro sestavení Docker obrazu
-      context: /app  # Adresář, ve kterém Docker hledá Dockerfile a další soubory potřebné pro sestavení
+      context: ./app  # Adresář, ve kterém Docker hledá Dockerfile a další soubory potřebné pro sestavení
       dockerfile: Dockerfile_flask  # Název Dockerfile, který bude použit pro sestavení obrazu
     expose:
       - "5000"  # Port, na kterém bude aplikace naslouchat uvnitř kontejneru, není přesměrován na hostitelský systém
@@ -22,14 +22,17 @@ services:
 # GUNICORN - PYTHON SERVER
   gunicorn:
     container_name: gunicorn  # Název kontejneru pro Gunicorn server
-    environment:
-      PYTHONPATH: /usr/src:${PYTHONPATH}
     build:
       context: ./app  # Adresář pro sestavení obrazu
       dockerfile: Dockerfile_gunicorn  # Název Dockerfile pro Gunicorn
-    command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"]  # Příkaz, který spustí Gunicorn server na portu 8000
+    volumes:
+      - ./app:/usr/src/app  # Mapování místního adresáře `./app` do `/usr/src/app` v kontejneru
     depends_on:
       - flask  # Gunicorn závisí na službě `flask`, která musí být spuštěna dříve
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:flask_app"]
+    # Příkaz, který spustí Gunicorn server dostupny na vsech adresach s dostupnym portem 8000
+    # hleda soubor run.py a vnem flask_app
+
 
 
 # REZERVNÍ PROXY - KOMUNIKAC EMEZI SLUŽBAMA
