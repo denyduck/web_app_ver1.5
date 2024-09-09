@@ -1,10 +1,11 @@
 # Název webové stránky
 # Tento název se zobrazuje v záhlaví webové stránky
-site_name: Projektová dokumentace - FLASK APP
+site_name: Bezpečnostní list
 
 # Adresář pro dokumenty
 # Určuje, kde se nacházejí Markdown soubory, které MkDocs použije pro generování webových stránek
 docs_dir: docs
+
 
 # Nastavení vzhledu a stylu webové stránky
 theme:

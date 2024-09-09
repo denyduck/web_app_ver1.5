@@ -10,3 +10,6 @@ venv/
 
 # zkompilovaný bytcode soubory Pythonu, které jsou generovány automaticky aby urychlili načítání modulů
 __pycache__/
+
+# testovaci soubory pro databazy
+db_data/

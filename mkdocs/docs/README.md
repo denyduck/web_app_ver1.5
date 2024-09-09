@@ -103,6 +103,9 @@ MkDocs je ideální pro projekty, kde je potřeba dobře strukturovaná a snadno
 ### MySQL
 
 **MySQL** je relační databázový systém pro ukládání a správu dat. Je široce používaný pro jeho výkon, spolehlivost a flexibilitu.
+## Náhled dokumentu
+
+[pdf-embedder url="/pdf/document1.pdf"]
 
 ### Adminer
 

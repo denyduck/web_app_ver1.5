@@ -1,4 +1,0 @@
-===============================
-* Umístění pro macro celého projektu
-* Macro bude v několika souborech
-* V souberch bude řazeno do modulů pro univerzální použítí

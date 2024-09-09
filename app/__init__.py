@@ -2,14 +2,14 @@ from flask import Flask
 
 # inicializace Flask
 def create_app():
-    app = Flask(__name__, instance_relative_config=False)
+    app = Flask(__name__, instance_relative_config=False, static_folder='../static')
     app.config.from_object("config.Config")
 
 
-    # import BP pro jeho registraci
-    from app.admin import admin_bp
-    # registrace BP
-    app.register_blueprint(admin_bp)
+    # importuj hlavni BP routes
+    from app.routes import routes_bp
+    # zaregistruj hlavni BP routes
+    app.register_blueprint(routes_bp)
 
 
     return app
