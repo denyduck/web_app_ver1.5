@@ -1,0 +1,37 @@
+{% import "macros_jinja/makra.jinja2" as makra %}
+
+<!doctype html>
+<html lang="cs">
+  <head>
+    <!--importy a meta data stranky-->
+    {{ makra.header() }}
+    <!--pojmenovani stranky-->
+    {{ makra.title("basic_inside")}}
+  </head>
+
+  <body data-bs-theme="dark">
+    <!--navigacni listy-->
+    {{ makra.navbar(True) }}
+
+    <!--MAKRO "sidebar"-->
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-3">
+          <div class="vertical-menu">
+            <a href="#">A-Z</a>
+            <a href="#">Potravinářské listy</a>
+            <a href="#">Nebezpečné látky</a>
+            <a href="#">Žíravé látky</a>
+            <a href="#">Hořlaviny</a>
+            <a href="#">Látky podle oddělení</a>
+            <a href="#">Hořlaviny</a>
+            <a href="#">Hořlaviny</a>         
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--END-MAKRO-->
+
+  </body>
+
+</html>

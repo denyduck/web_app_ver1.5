@@ -1,0 +1,214 @@
+/* VLASTNI STYLE
+1. Definice těla uvdní stránky
+    1.1 Přepínání režimu
+2. Styly pro navbar a jeho prvky
+    2.1 Oddělovač
+    2.2 Hover navigace
+    2.3 Ikona v navigaci
+
+3. Vyhledávací pole - uvodní stránka
+    3.1 Maska
+
+4. Úpráva fontu, velikosti,...
+    4.1 Zvětšování písma BIG
+    4.2 Zvětšování písma MEDIUM
+
+5. Footer
+6. Sidebar pro vertikalni menu
+    6.1 Odstavec pro menu
+    6.2 Hover pro menu
+
+7. Vyhledávací pole - inside page
+    7.1 Placeholder pro ikonu
+    7.2 Ikona vyhledávače (lupa)
+    7.3 Vyhledavac v navbaru 
+
+8. Úvodní popisek na home - respozivní
+*/
+
+/*======================================================================*/
+/* 1. styl pro úvodní body stranku a jehí prvky*/
+/*======================================================================*/
+body {
+    /*backround-image: url('/static/images/<example.neco>'*/ 
+    /*background-size: cover; /* Obrázek se přizpůsobí velikosti */
+    /*background-position: center; /* Umístění obrázku na střed */
+    /*background-repeat: no-repeat; /* Zabránění opakování obrázku */
+
+    margin: 0; /* Odstranění defaultního marginu */
+    height: 100vh; /* Výška nastavena na 100% viewportu */
+    display: flex;
+    flex-direction: column; /* Flexbox pro celkový layout */
+}
+
+/* 1.1 Styl pro dynamické přepínání režimu */
+body[data-theme='dark'] {
+    background-color: #333;
+    color: white;
+
+}
+body[data-theme='light'] {
+    background-color: #fff;
+    color: black;
+}
+/*======================================================================*/
+/* 2. Navbar a jeho prvky */
+/*======================================================================*/
+/* 2.1 Styl pro oddělovač mezi navigačními položkami a dropdown menu */
+.navbar .nav-item.separator::after {
+    content: "";
+    display: inline-block;
+    width: 1px; /* Šířka oddělovače */
+    height: 1.5rem; /* Výška oddělovače */
+    background-color: #fff; /* Barva oddělovače */
+    margin: 0 0.5rem; /* Okraje kolem oddělovače */
+}
+
+/* 2.2 Styl pro tlačítka při hoveru v navigacním panelu*/
+button:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* 2.3 Styl pro ikonu v navigaci */
+.navbar-brand i {
+    font-size: 2rem;
+    margin-bottom: 2px;
+}
+
+/*======================================================================*/
+/* 3. Styl pro vyhledávací pole */
+/*======================================================================*/
+.form-control-search {
+    height: 3rem; /* Zvětšení výšky vyhledávacího pole */
+    font-size: 1rem; /* Změna velikosti písma v inputu */
+}
+
+/* 3.1 Styl pro kartu s maskováním ve vyhledávacím poli*/
+.mask-custom {
+    background: rgba(24, 24, 16, .2);
+    border-radius: 3rem;
+    backdrop-filter: blur(15px);
+    border: 4px solid rgba(255, 255, 255, 0.274);
+    background-clip: padding-box;
+    box-shadow: 10px 10px 10px rgba(46, 54, 68, 0.03);
+}
+
+.mask-custom.border {
+    border: 1px solid rgba(255, 255, 255, 0.274);
+}
+
+/*======================================================================*/
+/* 4. Fonty, velikost, atd */
+/*======================================================================*/
+
+/* 4.1 Zvětšování písma */
+.big-font {
+    font-size: 5rem;
+}
+
+/* 4.2 Velikost písma pro střední texty */
+.md-font {
+font-size: 2rem;
+}
+
+/*======================================================================*/
+/* 5. Flexbox pro patičku, aby byla vždy dole */
+/*======================================================================*/
+.content {
+    flex: 1;
+}
+
+/*======================================================================*/
+/* 6. Sidebar pro vertikalni menu*/
+/*======================================================================*/
+.vertical-menu {
+    display: flex;
+    flex-direction: column;
+    background-color: transparent; /* Barva pozadí menu */
+    padding: 20px;
+    width: auto; /* Šířka menu */
+}
+
+/* 6.1 Sidebar pro vertikalni menu - odstavec*/
+.vertical-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px;
+    display: block;
+    border-radius: 5px;
+}
+
+/* 6.1 Sidebar pro vertikalni menu - hover items*/
+.vertical-menu a:hover {
+    background-color: #495057; /* Barva pozadí při najetí myší */
+}
+
+/*======================================================================*/
+/* 7. Vyhledávací pole - inside page */
+/*======================================================================*/
+.btn-search {
+    height: 2rem;
+    border-radius: 3em;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 7.1 placeholder pro ikonu a ikona*/
+.form-control-search::placeholder {
+    color: rgb(255, 255, 255);
+}
+
+
+/* 7.2 ikona */
+.search-icon {
+font-size: 1.5rem; /* Velikost ikony lupy */
+}
+
+/* 7.3 form-search vyhledavac v navigacni liste */
+.search-nav {
+    width: 300px;
+    height: 40px;
+}
+
+/*======================================================================*/
+/* 8. Respozivní text na úvodní stránce - i pro mnobilní rozlišení*/
+/*======================================================================*/
+/* 8. Nadpis + podnadpis */
+.custom-heading {
+    font-size: 5rem; /* Velikost textu pro velké obrazovky */
+}
+
+.custom-headingfor {
+    font-size: 2rem;
+}
+
+@media (max-width: 768px) {
+.custom-heading {
+    font-size: 4rem; /* Menší velikost textu pro tablety */
+}
+.custom-headingfor {
+    font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+.custom-heading {
+    font-size: 3rem; /* Ještě menší velikost textu pro mobily */
+}
+.custom-headingfor {
+    font-size: 2rem;
+    }
+}
+
+
+
+
+@media (max-width: 576px) {
+.text-brand {
+    display: none; /* Skrýt text na menších obrazovkách */
+    }
+}

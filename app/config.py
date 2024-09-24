@@ -5,3 +5,4 @@ class Config:
     SQLALCHEMY_DATABASE_URI = ""
     SQLALCHEMY_TRACK_MODIFICATIONS = ""
 
+    PDF_DIRECTORY = "./pdfs"
