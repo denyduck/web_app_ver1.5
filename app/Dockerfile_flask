@@ -19,5 +19,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENV PYTHONPATH="/usr/src:${PYTHONPATH}"
 
 # Spuštění Flask aplikace
+# CMD ["python", "run.py"]
 CMD ["python", "run.py"]
 

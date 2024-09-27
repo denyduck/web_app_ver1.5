@@ -1,6 +1,22 @@
 version: '3.8'  # Verze Docker Compose, která specifikuje verzi syntaxe a funkcí, které budou použity
 
 services:
+# DATABAZE
+  db:
+    image: mysql:8.0  # Použití oficiálního MySQL obrazu verze 8.0
+    container_name: db  # Název kontejneru pro MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password  # Heslo pro root uživatele MySQL
+      MYSQL_DATABASE: my_database  # Název databáze, která bude vytvořena
+      MYSQL_USER: my_user  # Uživatelské jméno pro nového MySQL uživatele
+      MYSQL_PASSWORD: my_password  # Heslo pro nového MySQL uživatele
+    ports:
+      - "3306:3306"  # Mapování portu 3306 v kontejneru na port 3306 na hostitelském systému
+    volumes:
+      - ./db_data:/var/lib/mysql  # Persistentní úložiště pro data MySQL, aby byla data uchována i po odstranění kontejneru
+    networks:
+      - my_network  # Síť, na které bude služba běžet
+
 
 # HLAVNÍ APLIKACE
   flask:  # Název služby, která bude provozovat Flask aplikaci
@@ -12,14 +28,11 @@ services:
       - "5000"  # Port, na kterém bude aplikace naslouchat uvnitř kontejneru, není přesměrován na hostitelský systém
     volumes:
       - ./app:/usr/src/app  # Mapování místního adresáře `./app` do `/usr/src/app` v kontejneru
-      # Mapování adresáře ./static do /usr/src/static v kontejneru
-      # V produkci se toto samo nepoužije, prootze jeji resi jako prvni NGINX kontejner,
-      # z toho duvodu se flask ani nedozvi ze nanej byl pozadavek
-      # NGINX ho odbavi mnohem rychleji, nepouzivase FLASK!!
-      - ./static:/usr/src/app/static #
     environment:
       FLASK_APP: run.py  # Určuje, který soubor Flask aplikace bude spuštěn
       FLASK_RUN_HOST: 0.0.0.0  # Nastavuje Flask aplikaci tak, aby byla dostupná zvenčí kontejneru
+    depends_on:
+      - db
     networks:
       - my_network  # Síť, na které bude služba běžet
 
@@ -34,11 +47,12 @@ services:
       - ./app:/usr/src/app  # Mapování místního adresáře `./app` do `/usr/src/app` v kontejneru
     depends_on:
       - flask  # Gunicorn závisí na službě `flask`, která musí být spuštěna dříve
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:flask_app"]
     networks:
       - my_network
-    command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:flask_app"]
     # Příkaz, který spustí Gunicorn server dostupny na vsech adresach s dostupnym portem 8000
     # hleda soubor run.py a vnem flask_app
+
 
 
 # REZERVNÍ PROXY - KOMUNIKAC EMEZI SLUŽBAMA
@@ -51,29 +65,12 @@ services:
       - "80:80"  # Mapování portu 80 v kontejneru na port 80 na hostitelském systému
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Mapování konfiguračního souboru Nginx z místního systému do kontejneru
-      - ./static:/usr/src/app/static # Oblsuhuje jako prvni adresar static
-      - ./pdfs:/usr/src/app/pdfs # Obshluje dotazy na pdf
+      - ./app:/usr/src/app # mapování adresáře pro přístup static souboru
     depends_on:
       - gunicorn  # Nginx závisí na službě `gunicorn`, která musí být spuštěna dříve
-
     networks:
       - my_network
 
-# DATABAZE
-  db:
-    image: mysql:8.0  # Použití oficiálního MySQL obrazu verze 8.0
-    container_name: mysql  # Název kontejneru pro MySQL
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password  # Heslo pro root uživatele MySQL
-      MYSQL_DATABASE: my_database  # Název databáze, která bude vytvořena
-      MYSQL_USER: my_user  # Uživatelské jméno pro nového MySQL uživatele
-      MYSQL_PASSWORD: my_password  # Heslo pro nového MySQL uživatele
-    ports:
-      - "3306:3306"  # Mapování portu 3306 v kontejneru na port 3306 na hostitelském systému
-    volumes:
-      - db_data:/var/lib/mysql  # Persistentní úložiště pro data MySQL, aby byla data uchována i po odstranění kontejneru
-    networks:
-      - my_network  # Síť, na které bude služba běžet
 
 
 # GUI PRO DB
