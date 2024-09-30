@@ -7,7 +7,7 @@ class Config:
     SECRET_KEY = "my_password"  # Tajný klíč pro ochranu sessions a cookies
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # Zabraňuje SQLAlchemy v sledování změn v objektech (výkonová optimalizace)
     SQLALCHEMY_DATABASE_URI ='mysql+pymysql://root:root_password@db/my_database'
-    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://my_user:my_password@localhost/my_database' # localhost bez DOCKERU
+    #SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://my_user:my_password@localhost/my_database' # localhost bez DOCKERU
 #'mysql+pymysql://root:root_password@db/my_database'   # URI pro připojení k databázi při vývoji
 
 '''# Konfigurace pro vývojové prostředí

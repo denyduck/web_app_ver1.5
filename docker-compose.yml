@@ -22,8 +22,8 @@ services:
   flask:  # Název služby, která bude provozovat Flask aplikaci
     container_name: web_flask  # Název kontejneru, který bude vytvořen
     build:  # Definice pro sestavení Docker obrazu
-      context: ./app  # Adresář, ve kterém Docker hledá Dockerfile a další soubory potřebné pro sestavení
-      dockerfile: Dockerfile_flask  # Název Dockerfile, který bude použit pro sestavení obrazu
+      context: ./app  # Adresář, ve kterém Docker hledá Dockerfile_watchdog a další soubory potřebné pro sestavení
+      dockerfile: Dockerfile_flask  # Název Dockerfile_watchdog, který bude použit pro sestavení obrazu
     expose:
       - "5000"  # Port, na kterém bude aplikace naslouchat uvnitř kontejneru, není přesměrován na hostitelský systém
     volumes:
@@ -42,7 +42,7 @@ services:
     container_name: gunicorn  # Název kontejneru pro Gunicorn server
     build:
       context: ./app  # Adresář pro sestavení obrazu
-      dockerfile: Dockerfile_gunicorn  # Název Dockerfile pro Gunicorn
+      dockerfile: Dockerfile_gunicorn  # Název Dockerfile_watchdog pro Gunicorn
     volumes:
       - ./app:/usr/src/app  # Mapování místního adresáře `./app` do `/usr/src/app` v kontejneru
     depends_on:
@@ -60,7 +60,7 @@ services:
     container_name: nginx  # Název kontejneru pro Nginx
     build:
       context: ./nginx  # Adresář pro sestavení Nginx obrazu
-      dockerfile: Dockerfile_nginx  # Název Dockerfile pro Nginx
+      dockerfile: Dockerfile_nginx  # Název Dockerfile_watchdog pro Nginx
     ports:
       - "80:80"  # Mapování portu 80 v kontejneru na port 80 na hostitelském systému
     volumes:
@@ -70,8 +70,6 @@ services:
       - gunicorn  # Nginx závisí na službě `gunicorn`, která musí být spuštěna dříve
     networks:
       - my_network
-
-
 
 # GUI PRO DB
   adminer:
@@ -83,12 +81,31 @@ services:
       - my_network  # Síť, na které bude služba běžet
 
 
+# HLIDANI ADRESARE
+  watch_dog:
+    container_name: wdog
+    build:
+      context: ./watchdog
+      dockerfile: Dockerfile_watchdog
+    #environment:
+     # - DIRECTORY_TO_WATCH
+    volumes:
+      #- ./${DIRECTORY_TO_WATCH}:/usr/src/${DIRECTORY_TO_WATCH}
+      - /home/duck/web_app_ver1.3/pdfs:/usr/src/pdfs:rw
+
+      # aboslutni cesta ka adresari a ujistit se o opravneni pokud bude pouzita
+    depends_on:
+      - flask
+    networks:
+      - my_network
+
+
 # PŘÍRUČKOVÝ MICROSITE
   mkdocs:
     container_name: mkdocs  # Název kontejneru pro MkDocs
     build:
       context: ./mkdocs  # Adresář pro sestavení obrazu MkDocs
-      dockerfile: Dockerfile_mkdocs  # Název Dockerfile pro MkDocs
+      dockerfile: Dockerfile_mkdocs  # Název Dockerfile_watchdog pro MkDocs
     ports:
       - "8005:8000"  # Mapování portu 8000 v kontejneru na port 8005 na hostitelském systému
     volumes:

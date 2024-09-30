@@ -1,0 +1,7 @@
+FROM python:3.9
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements_watchdog.txt
+CMD ["python", "watchdog_scripts.py"]
+
+LABEL authors="DM"
