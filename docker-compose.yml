@@ -87,11 +87,14 @@ services:
     build:
       context: ./watchdog
       dockerfile: Dockerfile_watchdog
-    #environment:
-     # - DIRECTORY_TO_WATCH
+    environment:
+      - DOCKER_DOG_DIRECTORY=${DOCKER_DOG_DIRECTORY}
     volumes:
-      #- ./${DIRECTORY_TO_WATCH}:/usr/src/${DIRECTORY_TO_WATCH}
-      - /home/duck/web_app_ver1.3/pdfs:/usr/src/pdfs:rw
+      - ./pdfs:/usr/src/app/pdfs
+      - ./env:/usr/src/app/.env
+
+      #- "${DOCKER_DOG_DIRECTORY}:/pdfs" PRIPOJIT V PRODUKCNIM PROSTREDI
+      #- /home/duck/web_app_ver1.3/pdfs:/usr/src/pdfs:rw PLATNE NA UNIX V DEVELOP PROSTREDI!
 
       # aboslutni cesta ka adresari a ujistit se o opravneni pokud bude pouzita
     depends_on:

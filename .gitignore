@@ -13,3 +13,6 @@ __pycache__/
 
 # testovaci soubory pro databazy
 db_data/
+
+# soubory PDFS
+pdfs/
