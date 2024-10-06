@@ -1,4 +1,4 @@
-from sqlalchemy import Text, Column, String
+from sqlalchemy import Text, Column, String, Date
 
 from app.models import db
 
@@ -8,6 +8,7 @@ class Pdflist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pdf_name = Column(String(300))
     pdf_content = Column(Text)
+
 
 
     def __repr__(self):

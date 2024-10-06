@@ -1,5 +1,7 @@
 from flask import Flask
-from app.models import db, Pdflist
+from app.models import db, migrate,Pdflist
+import threading
+
 #from config import get_config
 # inicializace Flask
 def create_app():
@@ -17,7 +19,12 @@ def create_app():
 
 
 
-    db.init_app(app)
+    # Inicializace db a migrací s aplikací
+    db.init_app(app)  # Inicializace databáze
+    migrate.init_app(app, db)  # Inicializace migrací
+
+
+
 
     # Provedení v kontextu aplikace
     with app.app_context():
