@@ -1,0 +1,18 @@
+
+# Použijeme oficiální Python 3.9 image
+FROM python:3.9
+
+# Nastavíme pracovní adresář v kontejneru
+WORKDIR /app
+
+# Zkopírujeme requirements.txt (pokud používáte nějaké závislosti)
+COPY requirements_rabb_consumer.txt ./
+
+# Instalace Python balíčků
+RUN pip install --no-cache-dir --upgrade -r requirements_rabb_consumer.txt
+
+# Zkopírujeme veškerý kód do kontejneru
+COPY . .
+
+# Spustíme konzumenta
+CMD ["python", "-u", "consumer.py"]

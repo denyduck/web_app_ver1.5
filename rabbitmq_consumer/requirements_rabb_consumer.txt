@@ -1,0 +1,4 @@
+pika==1.3.2
+pymysql==1.1.1
+SQLAlchemy==2.0.35
+cryptography==43.0.1

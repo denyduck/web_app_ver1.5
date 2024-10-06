@@ -87,12 +87,19 @@ services:
     build:
       context: ./watchdog
       dockerfile: Dockerfile_watchdog
+    env_file:
+      - .env
     environment:
-      - DOCKER_DOG_DIRECTORY=${DOCKER_DOG_DIRECTORY}
+      DOCKER_DOG_DIRECTORY: ${DOCKER_DOG_DIRECTORY}
+      # propoj s rabbitmq:management
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+
     volumes:
       - ./pdfs:/usr/src/app/pdfs
       - ./env:/usr/src/app/.env
-
       #- "${DOCKER_DOG_DIRECTORY}:/pdfs" PRIPOJIT V PRODUKCNIM PROSTREDI
       #- /home/duck/web_app_ver1.3/pdfs:/usr/src/pdfs:rw PLATNE NA UNIX V DEVELOP PROSTREDI!
 
@@ -101,6 +108,43 @@ services:
       - flask
     networks:
       - my_network
+
+
+# sdileni informaci z watchdogu pro ostatni kontejneru pomoci RABITMQ
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"         # Standardní port pro RabbitMQ
+      - "1500:15672"       # host:container
+    environment:
+      RABBITMQ_PLUGINS: "rabbitmq_shovel rabbitmq_shovel_management"
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    networks:
+      - my_network
+
+
+
+  rebbitmq_consumer:
+    container_name: rabbitmq_consumer
+    build:
+      context: ./rabbitmq_consumer
+      dockerfile: Dockerfile_rabb_consumer
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      START_MESSAGE: ${START_MESSAGE}
+      DATABASE_URL: ${DATABASE_URL}
+    networks:
+      - my_network
+    depends_on:
+      - rabbitmq
+      - db
 
 
 # PŘÍRUČKOVÝ MICROSITE

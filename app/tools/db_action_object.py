@@ -25,3 +25,4 @@ def delete_object(obj):
     except:
         db.session.rollback()
         return False
+

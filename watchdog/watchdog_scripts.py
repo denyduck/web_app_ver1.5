@@ -1,14 +1,20 @@
 import os
 import time  # Importuje modul time pro čekání během běhu programu
 import requests  # Knihovna pro odesílání HTTP požadavků (pro API, zde pro FLASK)
-
+import pika
 # z lokalního adresare pro kontener - mimo kontex projektu!
 from config_watchdog import docker_or_local
 
-from watchdog.observers import Observer  # Observer sleduje změny v souborovém systému
 from watchdog.events import FileSystemEventHandler  # FSWH zpracovává události (např. změna souborů)
 
 from watchdog.observers.polling import PollingObserver # z dovudu nekonzistentnich souborovych systemu na ruznych systemech
+
+import uuid
+
+from send_message import send_file_event
+from message import new_message
+
+message_id = str(uuid.uuid4())
 
 
 #directory_dog = docker_or_local()
@@ -20,13 +26,66 @@ print("Načtení skriptu ..")
 print(directory_dog)
 
 
-# Pro výpis všech souborů v adresáři
-for filename in os.listdir(directory_dog):
-    if filename.endswith(".pdf"):
-        print(f"PDF soubor nalezen: {filename}")
+
+#==========================================================================
+# ZISKANI DAT Z ENV, PRIPOJENI K RABBITMQ-KANAL, ODSLANI ZPRAVY
+#==========================================================================
+def connect_and_message(file_id, filename, directory, hash, change_type, metadata):
+    connection = None        # inicializace na None, zajistuje ze promena existuje ikdyz pripojeni selze
+
+    try: # ostereni vyvovlani vyjimky, preskoc na except
+
+        '''prihlasovaci udeje'''
+        credentials = pika.PlainCredentials(             # prihlasovaci udaje
+            os.getenv('RABBITMQ_USER', 'user'),          # nacti z compose/.env, pokud nic tak user
+            os.getenv('RABBITMQ_PASSWORD', 'password'))  # stejne
+
+        '''pripojeni'''
+        connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host=os.getenv('RABBITMQ_HOST', 'rabbitmq'),    # prihlasovaci udaje, pokud nejsou default: rabbitmq
+            port=int(os.getenv('RABBITMQ_PORT', '5672')),   # port jinak default 5672
+            credentials=credentials))
+
+        '''vytvor kanal'''
+        channel = connection.channel()      # vytvori kanal pro komunikaci
+
+        '''vytvor frontu do kanalu a nastav ji'''
+        channel.queue_declare(
+            queue='file_events',    # fronta s nazvem file_events
+            durable=True)           # True = fronta přezije restart kontejneru
+
+        '''Vytvoř zpravu a napln ji'''
+        make_messeage = new_message(message_id, filename, directory, hash, change_type, metadata)
+        print(make_messeage)     # Debug
+
+        '''odesli zpravu zabalenou s oznacenim hlavicky file_id a typem zpravy'''
+        sending_messeage = send_file_event(file_id, change_type, channel, make_messeage)
+        print(type(sending_messeage))     # Debug
+
+
+    except Exception as e:                          # pokud dojde k chybě v bloku try:
+        print(f'Chyba při zpracování zprávy: {e}')  # vraci chybu
+
+
+        '''uzavris spojeni v pripade:'''
+        # chyby
+        if connection and connection.is_open:
+            connection.close()
+
+    # po uspesnem odeslani
+    if connection and connection.is_open:  # Zkontroluje, zda je připojení otevřené
+        connection.close()  # Uzavření spojení
 
 
 
+
+
+
+
+
+#==========================================================================
+# Sledovač
+#==========================================================================
 class Watcher:
 
     def __init__(self):
@@ -69,47 +128,78 @@ class Watcher:
             self.observer.join()  # Čeká, dokud není sledování ukončeno
 
 
+#==========================================================================
+import hashlib
 
+# vypocita hash pro soubor
+def comput_file_hash(file_path):
+    sha256_hash = hashlib.sha256()
+    # otevri soubr v binarnim rezimu pro cteni dat i binarnich
+    with open(file_path, 'rb') as f:
+        for byte_block in iter(lambda: f.read(4096), b""):  # čte v blocích po 4096 bajtech (4 KB)
+            sha256_hash.update(byte_block)  # predani precteneho bloku do hash bloku
+    return sha256_hash.hexdigest()
 
+#==========================================================================
+# HANDLER PRO ZPRACOVÁNÍ UDÁLOSTÍ SOUBOROVÉHO SYSTÉMU
+#==========================================================================
 class Handler(FileSystemEventHandler):
-    """Třída Handler zpracovává události, které nastanou v sledovaném adresáři."""
+
+    '''Třída Handler zpracovává události, které nastanou v sledovaném adresáři.'''
+
+    def send_messeage(self, event, change_type, description):
+        file_id = str(uuid.uuid4())
+        filename = event.src_path.split("/")[-1]
+        directory = event.src_path.rsplit("/", 1)[0]
+        file_hash = comput_file_hash(event.src_path) if change_type != 'del' else None # pri zmenach krome smazani souboru
+
+
+        connect_and_message(
+            file_id = file_id,
+            filename = filename,
+            directory=directory,
+            hash = file_hash,
+            change_type=change_type,
+            metadata={'description':description}
+        )
+
 
     def on_created(self, event):
-        """Tato metoda je volána při vytvoření nového souboru."""
         if not event.is_directory:  # Ignoruje adresáře
             try:
-                print(f'Soubor {event.src_path} byl vytvořen!')  # Debug output
-                requests.post('http://nginx/requests/file_dog', json={'file': event.src_path})
+                self.send_messeage(event, 'new', 'Soubor byl vytvořen')
             except Exception as e:
-                print(f'Chyba při zpracování vytváření souboru: {e}')
+                print(f'Chyba při vytváření souboru: {e}')
+
 
     def on_modified(self, event):
-        """Tato metoda je volána při modifikaci existujícího souboru."""
         if not event.is_directory:  # Ignoruje adresáře
             try:
-                print(f'Soubor {event.src_path} byl upraven!')  # Debug output
-                #requests.post('http://nginx/requests/file_dog', json={'file': event.src_path})
+                self.send_messeage(event, 'edit', 'Soubot byl upraven')
             except Exception as e:
                 print(f'Chyba při zpracování úprav souboru: {e}')
 
 
     def on_deleted(self, event):
-        """Tato metoda je volána při smazání souboru."""
         if not event.is_directory:  # Ignoruje adresáře
             try:
-                print(f'Soubor {event.src_path} byl smazán!')  # Debug output
-                #requests.post('http://nginx/requests/file_dog', json={'file': event.src_path})
+                self.send_messeage(event, 'del', 'Soubor byl smazán')
             except Exception as e:
-                print(f'Chyba při mazání soubor: {e}')
+                print(f'Chyba při zpracování mazání souboru: {e}') # vola fci pro odkazovani na instanci tridy
+
 
     def on_moved(self, event):
         """Tato metoda je volána při přesunu souboru."""
         if not event.is_directory:  # Ignoruje adresáře
             try:
-                print(f'Soubor {event.src_path} byl přejmenován {event.dest_path}!')  # Debug output
-                #requests.post('http://nginx/requests/file_dog', json={'file': event.src_path})
+                self.send_messeage(event, 'del', 'Soubor byl přesunut nebo přejmenován')
+                event.src_path = event.dest_path
+
+                self.send_messeage(event, 'new', 'Soubor byl přesunut - nová cesta')
+
             except Exception as e:
                 print(f'Chyba při zpracování přesunutí souboru: {e}')
+
 
 if __name__ == '__main__':
     w = Watcher()
