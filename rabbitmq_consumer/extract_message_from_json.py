@@ -9,5 +9,6 @@ def extract_message_from_json(message_content):
         message_data['directory'],
         message_data['hash'],
         message_data['change_type'],
-        message_data['metadata']
+        message_data['metadata'],
+        message_data['content']
     )
