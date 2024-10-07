@@ -7,8 +7,6 @@ from config_watchdog import docker_or_local
 from tools import ex_path
 from watchdog.events import FileSystemEventHandler  # FSWH zpracovává události (např. změna souborů)
 
-import mysql.connector
-
 
 from watchdog.observers.polling import PollingObserver # z dovudu nekonzistentnich souborovych systemu na ruznych systemech
 
@@ -83,9 +81,104 @@ def connect_and_message(file_id, filename, directory, hash, change_type, metadat
 
 
 
+import hashlib
+
+# vypocita hash pro soubor
+def comput_file_hash(file_path):
+    sha256_hash = hashlib.sha256()
+    # otevri soubr v binarnim rezimu pro cteni dat i binarnich
+    with open(file_path, 'rb') as f:
+        for byte_block in iter(lambda: f.read(4096), b""):  # čte v blocích po 4096 bajtech (4 KB)
+            sha256_hash.update(byte_block)  # predani precteneho bloku do hash bloku
+    return sha256_hash.hexdigest()
 
 
+#==========================================================================
+# HANDLER PRO ZPRACOVÁNÍ UDÁLOSTÍ SOUBOROVÉHO SYSTÉMU
+#==========================================================================
+class Handler(FileSystemEventHandler):
 
+    def __init__(self):
+        self.directory_dog = docker_or_local()  # Inicializace v konstruktoru
+        self.pdf_list = []  # Seznam pro ukládání nalezených PDF souborů
+    # ==========================================================================
+    def check_directory(self):
+        directory = self.directory_dog
+
+        # Kontrola, zda je zadaná cesta platný adresář
+        if not os.path.isdir(directory):
+            raise ValueError('Zadaný adresář neexistuje nebo není přístupný.')
+
+        # Procházení souborů v adresáři
+        for filename in os.listdir(directory):
+            if filename.lower().endswith('.pdf'):  # Ověření, zda soubor končí na .pdf
+                # Přidání plné cesty k souboru do seznamu pdf_list
+                self.pdf_list.append(os.path.join(directory, filename))
+
+    # ==========================================================================
+    def send_messeage(self, event, change_type, description, directory_path):
+
+        file_id = str(uuid.uuid4())
+        filename = event.src_path.split("/")[-1]
+        directory = directory_path.rsplit("/", 1)[0]
+        file_hash = comput_file_hash(event.src_path) if change_type != 'del' else None # pri zmenach krome smazani souboru
+        kontent = ex_path(event.src_path) if change_type in ['new', 'edit'] else None
+
+        connect_and_message(
+            file_id = file_id,
+            filename = filename,
+            directory=directory,
+            hash = file_hash,
+            change_type=change_type,
+            metadata={'description':description},
+            kontent=kontent
+        )
+    # ==========================================================================
+    def sync_with_databses(self):
+    # zpracovani souboru, pokud jsou pritomni jiz v adresari
+    def simulate_existing_files(self):
+        """Projde seznam souborů a simuluje volání on_created pro každý soubor."""
+        for file_path in self.pdf_list:
+            event = type('Event', (object,), {'src_path': file_path, 'is_directory': False})()  # Simulace eventu
+            self.on_created(event)  # Volání metody on_created pro simulovaný event
+
+    # ==========================================================================
+    def on_created(self, event):
+        if not event.is_directory:  # Ignoruje adresáře
+            try:
+                self.send_messeage(event, 'new', 'Soubor byl vytvořen', event.src_path)
+            except Exception as e:
+                print(f'Chyba při vytváření souboru: {e}')
+
+    # ==========================================================================
+    def on_modified(self, event):
+        if not event.is_directory:  # Ignoruje adresáře
+            try:
+                self.send_messeage(event, 'edit', 'Soubot byl upraven', event.src_path)
+            except Exception as e:
+                print(f'Chyba při zpracování úprav souboru: {e}')
+
+    # ==========================================================================
+    def on_deleted(self, event):
+        if not event.is_directory:  # Ignoruje adresáře
+            time.sleep(0.1)
+            try:
+                self.send_messeage(event, 'del', 'Soubor byl smazán', event.src_path)
+            except Exception as e:
+                print(f'Chyba při zpracování mazání souboru: {e}') # vola fci pro odkazovani na instanci tridy
+
+    # ==========================================================================
+    def on_moved(self, event):
+        """Tato metoda je volána při přesunu souboru."""
+        if not event.is_directory:  # Ignoruje adresáře
+            try:
+                self.send_messeage(event, 'del', 'Soubor byl přesunut nebo přejmenován', event.src_path)
+                event.src_path = event.dest_path
+
+                self.send_messeage(event, 'new', 'Soubor byl přesunut - nová cesta', event.src_path)
+
+            except Exception as e:
+                print(f'Chyba při zpracování přesunutí souboru: {e}')
 
 #==========================================================================
 # Sledovač
@@ -97,9 +190,13 @@ class Watcher:
         #self.observer = Observer()
         self.directory_dog = directory_dog
         self.observer = PollingObserver()
+
+    # ==========================================================================
     def run(self):
         """Inicializuje sledování a spouští sledování změn v adresáři."""
         event_handler = Handler()  # Vytvoří instanci handleru
+        event_handler.check_directory()
+        event_handler.simulate_existing_files()
 
         try:
             self.observer.schedule(event_handler, self.directory_dog, recursive=True)
@@ -118,7 +215,6 @@ class Watcher:
             print(f'Nastala neočekávaná chyba: {e}')
             return
 
-
         try:
             while True:
                 time.sleep(5)  # Program běží
@@ -133,80 +229,8 @@ class Watcher:
 
 
 #==========================================================================
-import hashlib
-
-# vypocita hash pro soubor
-def comput_file_hash(file_path):
-    sha256_hash = hashlib.sha256()
-    # otevri soubr v binarnim rezimu pro cteni dat i binarnich
-    with open(file_path, 'rb') as f:
-        for byte_block in iter(lambda: f.read(4096), b""):  # čte v blocích po 4096 bajtech (4 KB)
-            sha256_hash.update(byte_block)  # predani precteneho bloku do hash bloku
-    return sha256_hash.hexdigest()
-
-#==========================================================================
-# HANDLER PRO ZPRACOVÁNÍ UDÁLOSTÍ SOUBOROVÉHO SYSTÉMU
-#==========================================================================
-class Handler(FileSystemEventHandler):
-
-    '''Třída Handler zpracovává události, které nastanou v sledovaném adresáři.'''
-
-    def send_messeage(self, event, change_type, description):
-        file_id = str(uuid.uuid4())
-        filename = event.src_path.split("/")[-1]
-        directory = event.src_path.rsplit("/", 1)[0]
-        file_hash = comput_file_hash(event.src_path) if change_type != 'del' else None # pri zmenach krome smazani souboru
-        kontent = ex_path(event.src_path) if change_type in ['new', 'edit'] else None
-
-        connect_and_message(
-            file_id = file_id,
-            filename = filename,
-            directory=directory,
-            hash = file_hash,
-            change_type=change_type,
-            metadata={'description':description},
-            kontent=kontent
-        )
-
-
-    def on_created(self, event):
-        if not event.is_directory:  # Ignoruje adresáře
-            try:
-                self.send_messeage(event, 'new', 'Soubor byl vytvořen')
-            except Exception as e:
-                print(f'Chyba při vytváření souboru: {e}')
-
-
-    def on_modified(self, event):
-        if not event.is_directory:  # Ignoruje adresáře
-            try:
-                self.send_messeage(event, 'edit', 'Soubot byl upraven')
-            except Exception as e:
-                print(f'Chyba při zpracování úprav souboru: {e}')
-
-
-    def on_deleted(self, event):
-        if not event.is_directory:  # Ignoruje adresáře
-            time.sleep(0.1)
-            try:
-                self.send_messeage(event, 'del', 'Soubor byl smazán')
-            except Exception as e:
-                print(f'Chyba při zpracování mazání souboru: {e}') # vola fci pro odkazovani na instanci tridy
-
-
-    def on_moved(self, event):
-        """Tato metoda je volána při přesunu souboru."""
-        if not event.is_directory:  # Ignoruje adresáře
-            try:
-                self.send_messeage(event, 'del', 'Soubor byl přesunut nebo přejmenován')
-                event.src_path = event.dest_path
-
-                self.send_messeage(event, 'new', 'Soubor byl přesunut - nová cesta')
-
-            except Exception as e:
-                print(f'Chyba při zpracování přesunutí souboru: {e}')
-
 
 if __name__ == '__main__':
+
     w = Watcher()
     w.run()
