@@ -44,11 +44,14 @@ class Files(Base):
     size = Column(BigInteger)                                    # Velikost souboru v bajtech
     is_active = Column(Boolean, default=True)                    # Aktivní status
     message_id = Column(String(255), nullable=False)             # identifikace zpravy
+    kontent = Column(Text)
 
     def __repr__(self):
         return f"<Files(id={self.id}, filename={self.filename}, message_id={self.message_id})>"
 
-
+    __table_args__ = (
+        {'mysql_charset': 'utf8mb4', 'mysql_collate': 'utf8mb4_unicode_ci'},
+    )
 
     changes = relationship('FileChanges', back_populates='file')
     file_metadata = relationship('FileMetadata', back_populates='file')
@@ -63,7 +66,7 @@ class FileChanges(Base):
 
     id = Column(Integer, primary_key=True)                              # Primární klíč
     file_id = Column(Integer, ForeignKey('files.id'), nullable=True)    # Opravený cizí klíč na Files
-    filename = Column(String(255), nullable=False)  #DOPLNIT POTOM SMAZAT!!
+    filename = Column(String(255), nullable=True)  #DOPLNIT POTOM SMAZAT!!
     changed_at = Column(TIMESTAMP, server_default=func.now())    # Datum změny
     change_type = Column(Enum(ChangeType), nullable=False)       # Typ změny
     old_hash = Column(String(64))                                # Původní hash

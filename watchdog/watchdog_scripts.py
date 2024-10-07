@@ -4,8 +4,11 @@ import requests  # Knihovna pro odesílání HTTP požadavků (pro API, zde pro 
 import pika
 # z lokalního adresare pro kontener - mimo kontex projektu!
 from config_watchdog import docker_or_local
-
+from tools import ex_path
 from watchdog.events import FileSystemEventHandler  # FSWH zpracovává události (např. změna souborů)
+
+import mysql.connector
+
 
 from watchdog.observers.polling import PollingObserver # z dovudu nekonzistentnich souborovych systemu na ruznych systemech
 
@@ -30,7 +33,7 @@ print(directory_dog)
 #==========================================================================
 # ZISKANI DAT Z ENV, PRIPOJENI K RABBITMQ-KANAL, ODSLANI ZPRAVY
 #==========================================================================
-def connect_and_message(file_id, filename, directory, hash, change_type, metadata):
+def connect_and_message(file_id, filename, directory, hash, change_type, metadata, kontent):
     connection = None        # inicializace na None, zajistuje ze promena existuje ikdyz pripojeni selze
 
     try: # ostereni vyvovlani vyjimky, preskoc na except
@@ -55,12 +58,13 @@ def connect_and_message(file_id, filename, directory, hash, change_type, metadat
             durable=True)           # True = fronta přezije restart kontejneru
 
         '''Vytvoř zpravu a napln ji'''
-        make_messeage = new_message(message_id, filename, directory, hash, change_type, metadata)
+        make_messeage = new_message(message_id, filename, directory, hash, change_type, metadata, kontent)
         print(make_messeage)     # Debug
 
         '''odesli zpravu zabalenou s oznacenim hlavicky file_id a typem zpravy'''
         sending_messeage = send_file_event(file_id, change_type, channel, make_messeage)
         print(type(sending_messeage))     # Debug
+
 
 
     except Exception as e:                          # pokud dojde k chybě v bloku try:
@@ -152,7 +156,7 @@ class Handler(FileSystemEventHandler):
         filename = event.src_path.split("/")[-1]
         directory = event.src_path.rsplit("/", 1)[0]
         file_hash = comput_file_hash(event.src_path) if change_type != 'del' else None # pri zmenach krome smazani souboru
-
+        kontent = ex_path(event.src_path) if change_type in ['new', 'edit'] else None
 
         connect_and_message(
             file_id = file_id,
@@ -160,7 +164,8 @@ class Handler(FileSystemEventHandler):
             directory=directory,
             hash = file_hash,
             change_type=change_type,
-            metadata={'description':description}
+            metadata={'description':description},
+            kontent=kontent
         )
 
 
@@ -182,6 +187,7 @@ class Handler(FileSystemEventHandler):
 
     def on_deleted(self, event):
         if not event.is_directory:  # Ignoruje adresáře
+            time.sleep(0.1)
             try:
                 self.send_messeage(event, 'del', 'Soubor byl smazán')
             except Exception as e:
