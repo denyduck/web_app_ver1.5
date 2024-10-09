@@ -1,8 +1,8 @@
 from flask import Flask
-from app.models import db, migrate,Pdflist
-import threading
+from shared_models import db, migrate
 
-#from config import get_config
+
+
 # inicializace Flask
 def create_app():
     app = Flask(__name__, instance_relative_config=False)

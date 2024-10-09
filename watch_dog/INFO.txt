@@ -1,3 +1,5 @@
 Tento kód využívá knihovnu Watchdog, která umožňuje sledovat změny v souborovém systému.
 Kód sleduje konkrétní adresář a reaguje na události,
 jako jsou změny nebo modifikace souborů, tím, že odešle HTTP požadavek na Flask aplikaci.
+
+druha cas bude procesovat PDF soubory.

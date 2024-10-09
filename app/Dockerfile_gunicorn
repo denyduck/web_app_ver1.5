@@ -10,6 +10,9 @@ COPY requirements.txt ./
 # Instalace závislostí
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
+# adresar pro databaze
+RUN mkdir shared_models
+
 # Kopíruji ostatní soubory
 COPY . .
 

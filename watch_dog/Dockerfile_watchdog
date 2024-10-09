@@ -1,0 +1,33 @@
+
+# Základní image Python 3.9 pro celý kontejner
+FROM python:3.9-slim
+
+# Instalace závislostí pro Poppler, Tesseract a další
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    libgl1-mesa-glx \
+    poppler-utils \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Nastavení pracovního adresáře pro aplikaci
+WORKDIR /usr/src/app
+
+# Kopírování všech souborů aplikace do kontejneru
+COPY . .
+
+# Instalace Python závislostí z requirements souborů pro watch_dog a PDF procesor
+RUN pip install --no-cache-dir --upgrade -r requirements_watchdog.txt
+RUN pip install --no-cache-dir --upgrade -r pdf_procesor_requirements.txt
+
+# Vytvoření adresáře /pdfs pro produkční prostředí, pokud je potřeba
+# RUN mkdir -p /usr/src/app/pdfs
+
+# Přednastavení proměnné prostředí pro zpracování PDF (volitelně, podle aplikace)
+ENV PDF_PROCESS_DIR=/usr/src/app/pdfs
+
+# CMD pro spuštění aplikace
+CMD ["python", "-u", "watchdog_scripts.py"]
+
+# Label informace
+LABEL authors="DM"

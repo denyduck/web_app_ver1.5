@@ -1,4 +1,4 @@
-from app.models import db
+from pdfs.models import db
 
 
 # prida objekt do databaze a osetri chybu rollbackem

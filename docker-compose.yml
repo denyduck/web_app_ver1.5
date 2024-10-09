@@ -27,7 +27,11 @@ services:
     expose:
       - "5000"  # Port, na kterém bude aplikace naslouchat uvnitř kontejneru, není přesměrován na hostitelský systém
     volumes:
-      - ./app:/usr/src/app  # Mapování místního adresáře `./app` do `/usr/src/app` v kontejneru
+      - ./app:/usr/src/app                            # Mapování místního adresáře `./app` do `/usr/src/app` v kontejneru
+      - ./shared_models/__init__.py:/usr/src/app/shared_models/__init__.py
+      - ./shared_models/__init__.py:/usr/src/app/shared_models/__init__.py
+
+    # Mapovani sdilenych modelu
     environment:
       FLASK_APP: run.py  # Určuje, který soubor Flask aplikace bude spuštěn
       FLASK_RUN_HOST: 0.0.0.0  # Nastavuje Flask aplikaci tak, aby byla dostupná zvenčí kontejneru
@@ -45,6 +49,8 @@ services:
       dockerfile: Dockerfile_gunicorn  # Název Dockerfile_watchdog pro Gunicorn
     volumes:
       - ./app:/usr/src/app  # Mapování místního adresáře `./app` do `/usr/src/app` v kontejneru
+      - ./shared_models/__init__.py:/usr/src/app/shared_models/__init__.py
+      - ./shared_models/__init__.py:/usr/src/app/shared_models/__init__.py
     depends_on:
       - flask  # Gunicorn závisí na službě `flask`, která musí být spuštěna dříve
     command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:flask_app"]
@@ -85,12 +91,13 @@ services:
   watch_dog:
     container_name: wdog
     build:
-      context: ./watchdog
+      context: watch_dog
       dockerfile: Dockerfile_watchdog
     env_file:
       - .env
     environment:
       DOCKER_DOG_DIRECTORY: ${DOCKER_DOG_DIRECTORY}
+
       # propoj s rabbitmq:management
       RABBITMQ_HOST: ${RABBITMQ_HOST}
       RABBITMQ_PORT: ${RABBITMQ_PORT}
@@ -106,6 +113,8 @@ services:
       # aboslutni cesta ka adresari a ujistit se o opravneni pokud bude pouzita
     depends_on:
       - flask
+      - db
+      - rabbitmq
     networks:
       - my_network
 
@@ -125,12 +134,14 @@ services:
       - my_network
 
 
-
   rebbitmq_consumer:
     container_name: rabbitmq_consumer
     build:
       context: ./rabbitmq_consumer
       dockerfile: Dockerfile_rabb_consumer
+    volumes:
+      - ./shared_models/__init__.py:/app/shared_models/__init__.py           # inicializace models
+      - ./shared_models/rabbit_models.py:/app/shared_models/rabbit_models.py # rabbit models
     env_file:
       - .env
     environment:
@@ -140,6 +151,8 @@ services:
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       START_MESSAGE: ${START_MESSAGE}
       DATABASE_URL: ${DATABASE_URL}
+
+
     networks:
       - my_network
     depends_on:

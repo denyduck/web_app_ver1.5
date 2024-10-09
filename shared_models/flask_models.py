@@ -1,8 +1,5 @@
-from sqlalchemy import Text, Column, String, Date
-
-from app.models import db
-
-
+from sqlalchemy import Text, Column, String
+from shared_models import db
 class Pdflist(db.Model):
     __tablename__ = 'pdflist'
     id = db.Column(db.Integer, primary_key=True)

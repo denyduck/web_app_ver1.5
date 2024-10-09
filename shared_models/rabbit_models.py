@@ -8,10 +8,13 @@ from sqlalchemy import (Text,
                         BigInteger,
                         Boolean,
                         ForeignKey,
-                        Enum)
-from sqlalchemy.ext.declarative import declarative_base
+                        Enum,
+                        Index)
+
+from shared_models import Base
 from sqlalchemy.orm import relationship
 import enum
+
 
 '''
 func.now()                  # Používá funkci now() databázového serveru k získání aktuálního data a času.
@@ -20,18 +23,17 @@ onupdate=func.now())        # změn hodnotu sloupce pokaždé, když je záznam 
 '''
 
 
-# Vytvoření základní třídy, nejsem v kontextu palikace Flask
-Base = declarative_base()
-
 # Enum pro typ změny
 class ChangeType(enum.Enum):
     CREATED = "created"
     MODIFIED = "modified"
     DELETED = "deleted"
 
+
 #===================================================================================
 # Tabulka `files` zobrazuje informace a aktualni soubory
 #===================================================================================
+
 class Files(Base):
     __tablename__ = 'files'  # Název tabulky
 
@@ -46,15 +48,19 @@ class Files(Base):
     message_id = Column(String(255), nullable=False)             # identifikace zpravy
     kontent = Column(Text)
 
+
     def __repr__(self):
         return f"<Files(id={self.id}, filename={self.filename}, message_id={self.message_id})>"
 
+
     __table_args__ = (
-        {'mysql_charset': 'utf8mb4', 'mysql_collate': 'utf8mb4_unicode_ci'},
+        Index('idx_fulltext_search', 'kontent', 'filename', mysql_prefix='FULLTEXT'),
+        {'mysql_charset': 'utf8mb4', 'mysql_collate': 'utf8mb4_unicode_ci'}
     )
 
     changes = relationship('FileChanges', back_populates='file')
     file_metadata = relationship('FileMetadata', back_populates='file')
+
 #===================================================================================
 #Tabulka 'File_changes'
 #===================================================================================

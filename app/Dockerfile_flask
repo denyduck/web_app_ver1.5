@@ -15,6 +15,8 @@ COPY . .
 # Volba --no-cache-dir zajišťuje, že cache nebude uložena, což šetří místo
 RUN pip install --no-cache-dir -r requirements.txt
 
+
+
 # proměná prostředí - adresář kde python hledá balíček
 ENV PYTHONPATH="/usr/src:${PYTHONPATH}"
 

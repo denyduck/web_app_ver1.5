@@ -3,3 +3,6 @@ pymysql==1.1.1
 SQLAlchemy==2.0.35
 cryptography==43.0.1
 
+# pozdeji integrovat jednotlive init pro kazdy models z duvodu insatalace zavislosti do dalsich models
+flask-sqlalchemy
+flask_migrate
