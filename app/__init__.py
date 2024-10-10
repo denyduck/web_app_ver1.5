@@ -34,11 +34,3 @@ def create_app():
 
 
 
-'''    # zajištění propojení do kontextu aplikace:
-    with app.app_context():
-        # vytvoří všechny tabulky
-        db.create_all()'''
-
-
-
-

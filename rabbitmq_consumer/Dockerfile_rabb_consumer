@@ -11,8 +11,7 @@ COPY requirements_rabb_consumer.txt ./
 # Instalace Python balíčků
 RUN pip install --no-cache-dir --upgrade -r requirements_rabb_consumer.txt
 
-# Vytvor adresar pro dedikovane models
-RUN mkdir shared_models
+
 
 # Zkopírujeme veškerý kód do kontejneru
 COPY . .

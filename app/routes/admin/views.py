@@ -1,5 +1,24 @@
 '''
 REGISTRUJ STRANKY DO BP ADMIN
+- zakladni roozvrzeni stranky vychazi z base respektive z base_inside ->pro stranky uvnitr,
+a z base_outside.
+
+- po rozvrzeni v base se html selektuje do jednotlivych maker
+- makra se prekopiruji do "macros_jinja"
+- nyni mohou byt jednotliva makra pouzita v ruznych strankach pomoci jinja tagu
+- pretezovani zavyslosti maker
+
+
+1. IMPORTY zavyslosti
+2. REGISTRACE potřebnych <page>.html do obsahu blueprintu
+    2.1 base_admin - rozlozeni, navrh pro odvozeni maker
+    2.2 home
+    2.3 *Testování BASE pred nasazením
+
+'''
+
+'''
+REGISTRUJ STRANKY DO BP ADMIN
 1. IMPORTY zavyslosti
 2. REGISTRACE potřebnych <page>.html do obsahu blueprintu
     2.1 base_admin - rozlozeni, navrh pro odvozeni maker
@@ -9,7 +28,9 @@ REGISTRUJ STRANKY DO BP ADMIN
 '''
 
 # 1. IMPORTY
-from flask import render_template
+from flask import render_template, request, jsonify
+from shared_models.rabbit_models import Files
+from shared_models import session
 from app.routes.admin import admin_bp
 
 
@@ -18,14 +39,39 @@ from app.routes.admin import admin_bp
 
 @admin_bp.route('/')
 def home():
+    query = request.args.get('query', '').strip()
+    results = []
 
-    return render_template('home.html')
+    if query:
+        # Hlavní vyhledávání
+        results = session.query(Files).filter(
+            Files.kontent.like(f'%{query}%') | Files.filename.like(f'%{query}%')
+        ).all()
+
+    return render_template('home.html', results=results, query=query)
+
+@admin_bp.route('/autocomplete')
+def autocomplete():
+    query = request.args.get('query', '').strip().lower()
+    results = []
+
+    if query:
+        # Návrhy na základě názvu souboru
+        results = session.query(Files).filter(
+            Files.filename.like(f'%{query}%')
+        ).all()
+
+    # Vrátíme návrhy jako JSON
+    return jsonify([{'filename': file.filename} for file in results])
+
 
 @admin_bp.route('/prohlizet')
 def prohlizet():
     return render_template('prohlizet.html')
 
-
+@admin_bp.route('/intra')
+def intra():
+    return render_template('intra.html')
 
 
 

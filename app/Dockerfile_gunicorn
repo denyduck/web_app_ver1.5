@@ -6,7 +6,6 @@ WORKDIR /usr/src/app
 
 # Kopíruji soubor s požadavky
 COPY requirements.txt ./
-
 # Instalace závislostí
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 

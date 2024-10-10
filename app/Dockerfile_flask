@@ -7,7 +7,6 @@ WORKDIR /usr/src/app
 # Kopíruji soubor s požadavky do pracovního adresáře
 # Tento krok je oddělený, aby se využil cache a ušetřil čas při následných buildách
 COPY requirements.txt ./
-
 # Kopíruji ostatní soubory do pracovního adresáře kontejneru
 COPY . .
 
@@ -16,11 +15,9 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-
 # proměná prostředí - adresář kde python hledá balíček
 ENV PYTHONPATH="/usr/src:${PYTHONPATH}"
 
 # Spuštění Flask aplikace
-# CMD ["python", "run.py"]
-CMD ["python", "run.py"]
+CMD ["python", "-u", "run.py"]
 
