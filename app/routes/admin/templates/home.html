@@ -48,7 +48,7 @@
                        aria-label="Search"
                        style="outline: none; box-shadow: none;"
                        required>
-                <div id="suggestions" class="list-group" style="position: absolute; z-index: 1000; width: 100%; display: none;"></div>
+                <div id="suggestions" class="list-group" style="position: absolute; z-index: 1000; width: 100%; display: none; max-height: 200px; overflow-y: auto;"></div>
               </div>
 
               <!-- Tlačítko pro spuštění vyhledávání -->
@@ -63,45 +63,231 @@
         </div>
       </div>
 
-      <!-- Výsledky hledání -->
+    <!-- Výsledky hledání -->
       <div id="searchResults" class="mt-4">
         {% if results %}
           <ul class="list-group">
             {% for result in results %}
               <li class="list-group-item">
                 <a href="/pdfs/{{ result.filename }}" target="_blank">{{ result.filename }}</a>
+
               </li>
             {% endfor %}
           </ul>
         {% else %}
-          <p>Žádné výsledky nenalezeny.</p>
+          <p class="text-muted">Žádné výsledky nenalezeny.</p>  <!-- Přidání zprávy pro prázdné výsledky -->
         {% endif %}
       </div>
+
+        <!-- Modální okno pro seznam výsledků -->
+      <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="resultsModalLabel">Nalezené PDF soubory</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+            </div>
+            <div class="modal-body">
+              <ul id="resultsList" class="list-group">
+                <!-- Výsledky budou dynamicky vloženy sem -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>
+        .custom-heading {
+          font-size: 5rem; /* Velikost textu pro velké obrazovky */
+        }
+
+        .custom-headingfor {
+          font-size: 2rem;
+        }
+
+        @media (max-width: 768px) {
+          .custom-heading {
+            font-size: 4rem; /* Menší velikost textu pro tablety */
+          }
+          .custom-headingfor {
+            font-size: 2rem;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .custom-heading {
+            font-size: 3rem; /* Ještě menší velikost textu pro mobily */
+          }
+          .custom-headingfor {
+            font-size: 2rem;
+          }
+        }
+      </style>
+
+      <script>
+        let currentFocus = -1; // Pro sledování aktuální pozice ve výběru
+
+        // Načítání návrhů na základě vstupu uživatele
+        document.getElementById('searchField').addEventListener('input', function() {
+          let query = this.value;
+
+          // Pokud je dotaz prázdný, vyčisti návrhy
+          if (!query) {
+            document.getElementById('suggestions').innerHTML = '';
+            document.getElementById('suggestions').style.display = 'none';
+            return;
+          }
+
+          // AJAX volání pro získání návrhů
+          fetch('/autocomplete?query=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+              const suggestions = document.getElementById('suggestions');
+              suggestions.innerHTML = ''; // Vyčisti předchozí návrhy
+              currentFocus = -1; // Resetuj aktuální pozici při novém hledání
+
+              // Zpracování návrhů
+              data.forEach((item) => {
+                const suggestionItem = document.createElement('a');
+                suggestionItem.className = 'list-group-item list-group-item-action';
+                suggestionItem.textContent = item.filename;  // Název souboru
+
+                // Přidání události pro kliknutí na návrh
+                suggestionItem.addEventListener('click', function() {
+                  window.open('/pdfs/' + item.filename, '_blank');  // Otevře PDF v novém okně
+                  document.getElementById('suggestions').innerHTML = '';  // Vyčisti návrhy
+                  document.getElementById('searchField').value = ''; // Vyprázdni vyhledávací pole
+                  suggestions.style.display = 'none';  // Skrýt návrhy po výběru
+                });
+
+                suggestions.appendChild(suggestionItem);
+              });
+
+              // Zobraz návrhy, pokud existují
+              suggestions.style.display = data.length ? 'block' : 'none';
+            })
+            .catch(error => console.error('Chyba při načítání návrhů:', error));
+        });
+
+        // Navigace v návrzích pomocí klávesnice
+        document.getElementById('searchField').addEventListener('keydown', function(e) {
+          const suggestions = document.getElementById('suggestions');
+          const items = suggestions.getElementsByTagName('a');
+
+          if (e.key === 'ArrowDown') {
+            // Šipka dolů
+            currentFocus++;
+            if (currentFocus >= items.length) currentFocus = 0;
+            setActive(items);
+          } else if (e.key === 'ArrowUp') {
+            // Šipka nahoru
+            currentFocus--;
+            if (currentFocus < 0) currentFocus = items.length - 1;
+            setActive(items);
+          } else if (e.key === 'Enter') {
+            // Potvrzení klávesou Enter
+            e.preventDefault();
+
+            // Pokud je v našeptávači vybrána nějaká položka, vyber ji
+            if (currentFocus > -1 && items[currentFocus]) {
+              items[currentFocus].click();
+            } else {
+              // Pokud není vybrán žádný návrh, spustí se vyhledávání stejně jako při kliknutí na tlačítko "Hledat"
+              searchFiles();
+            }
+          } else if (e.key === 'Escape') {
+            // Zavření návrhů klávesou Escape
+            suggestions.style.display = 'none';
+          }
+        });
+
+        // Nastaví aktivní prvek v seznamu návrhů
+        function setActive(items) {
+          // Odstraní aktivní třídu ze všech položek
+          for (let i = 0; i < items.length; i++) {
+            items[i].classList.remove('active');
+          }
+          // Přidá aktivní třídu k aktuální položce
+          if (items[currentFocus]) {
+            items[currentFocus].classList.add('active');
+            items[currentFocus].scrollIntoView({ block: "nearest" });
+          }
+        }
+
+        // Funkce pro spuštění vyhledávání (použitá jak pro tlačítko, tak pro klávesu Enter)
+        function searchFiles() {
+          let query = document.getElementById('searchField').value;
+
+          // Pokud je dotaz prázdný, vyčisti návrhy a modální okno
+          if (!query) {
+            document.getElementById('resultsList').innerHTML = '<li class="list-group-item">Zadejte hledaný název.</li>';
+            const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
+            resultsModal.show();
+            return;
+          }
+
+          // AJAX volání pro získání výsledků
+          fetch('/autocomplete?query=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+              const resultsList = document.getElementById('resultsList');
+              resultsList.innerHTML = ''; // Vyčisti předchozí výsledky
+
+              if (data.length > 0) {
+                // Pro každý nalezený soubor přidáme do seznamu novou položku
+                data.forEach((item) => {
+                  const resultItem = document.createElement('li');
+                  resultItem.className = 'list-group-item';
+
+                  // Odkaz na PDF soubor
+                  const link = document.createElement('a');
+                  link.href = '/pdfs/' + item.filename;
+                  link.target = '_blank'; // Otevře PDF v novém okně
+                  link.textContent = item.filename; // Zobrazí název souboru
+
+                  resultItem.appendChild(link);
+                  resultsList.appendChild(resultItem);
+                });
+              } else {
+                // Pokud nejsou nalezeny žádné výsledky
+                resultsList.innerHTML = '<li class="list-group-item">Žádné výsledky nenalezeny.</li>';
+              }
+
+              // Zobrazení modálního okna s výsledky
+              const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
+              resultsModal.show();
+
+              // Vyprázdni vyhledávací pole po zobrazení výsledků
+              document.getElementById('searchField').value = '';
+            })
+            .catch(error => {
+              console.error('Chyba při vyhledávání:', error);
+              document.getElementById('resultsList').innerHTML = '<li class="list-group-item">Došlo k chybě při vyhledávání.</li>';
+              const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
+              resultsModal.show();
+
+              // Vyprázdni vyhledávací pole i v případě chyby
+              document.getElementById('searchField').value = '';
+            });
+        }
+
+        // Vyhledávání po kliknutí na tlačítko "Hledat"
+        document.getElementById('searchButton').addEventListener('click', function() {
+          searchFiles();
+        });
+        // Umístění kurzoru do vyhledávacího pole při načtení stránky
+        window.addEventListener('load', function() {
+          document.getElementById('searchField').focus();
+        });
+
+        // Přidání události pro zavření modálu
+        document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
+          // Vyprázdni a skryj našeptávač při zavření modálního okna
+          document.getElementById('suggestions').innerHTML = '';
+          document.getElementById('suggestions').style.display = 'none';
+          document.getElementById('searchField').focus();
+        });
+      </script>
     </div>
-
-    <script>
-
-    </script>
-
-    <style>
-      #suggestions {
-        max-height: 200px;
-        overflow-y: auto;
-        border: 1px solid #ddd;
-        background: white;
-        border-radius: 4px;
-      }
-
-      .list-group-item {
-        cursor: pointer;
-      }
-
-      /* Zobrazit návrhy, když jsou k dispozici */
-      .list-group-item:hover {
-        background-color: #f0f0f0;
-      }
-    </style>
-
     {{  makra.footer() }}
-
   </body>

@@ -36,7 +36,6 @@ from app.routes.admin import admin_bp
 
 
 # 2. REGISTRACE
-
 @admin_bp.route('/')
 def home():
     query = request.args.get('query', '').strip()
@@ -56,13 +55,13 @@ def autocomplete():
     results = []
 
     if query:
-        # Návrhy na základě názvu souboru
+        # Vyhledávání na základě názvu souboru nebo obsahu
         results = session.query(Files).filter(
-            Files.filename.like(f'%{query}%')
+            Files.filename.like(f'%{query}%') | Files.kontent.like(f'%{query}%')
         ).all()
 
     # Vrátíme návrhy jako JSON
-    return jsonify([{'filename': file.filename} for file in results])
+    return jsonify([{'filename': file.filename, 'kontent': file.kontent[:200]} for file in results])
 
 
 @admin_bp.route('/prohlizet')

@@ -22,8 +22,11 @@
     7.1 Placeholder pro ikonu
     7.2 Ikona vyhledávače (lupa)
     7.3 Vyhledavac v navbaru 
+    7.4 Stylovani group items ktere dynamicky vapdavaji do dropdownmenu
 
 8. Úvodní popisek na home - respozivní
+9.
+
 */
 
 /*======================================================================*/
@@ -173,6 +176,26 @@ font-size: 1.5rem; /* Velikost ikony lupy */
     width: 250px;
     height: 40px;
 }
+
+/* 7.4 stylovani pro vypadavajici dropwdown search */
+
+#suggestions {
+    max-height: 100px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+}
+
+.list-group-item {
+    cursor: pointer;
+}
+
+/* Zobrazit návrhy, když jsou k dispozici */
+.list-group-item:hover {
+    background-color: #f0f0f0;
+}
+
 
 /*======================================================================*/
 /* 8. Respozivní text na úvodní stránce - i pro mnobilní rozlišení*/
