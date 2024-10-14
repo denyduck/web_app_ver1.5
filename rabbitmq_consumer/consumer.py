@@ -28,6 +28,9 @@ class MessageConsumer:
         self.connection = None
         self.channel = None
         self.file_pdf_path = None
+        # navazani spojeni s databazi (pomoci instance tridy dabase)
+        session = self.database.Session()
+        self.session = session
 
     def connect(self):
         ''' Připojení k RabbitMQ '''
@@ -55,6 +58,13 @@ class MessageConsumer:
 
         print('Čekám na příchozí zprávy. Pro ukončení stiskni CTRL+C')
         self.channel.start_consuming()
+
+    def check_item_db(self, hash):
+        ''' Kontrolvani zda se soubor s hash <xyz> nenachazi v db Files ve sloupci hash '''
+        existing_file = self.session.query(Files).filter(Files.hash == hash).first()
+        print('kontrola pripojeni k datavzi')
+
+        return existing_file is not None
 
     def callback_outcoming(self, ch, method, properties, body):
         ''' Zpracování příchozí zprávy '''
@@ -92,32 +102,45 @@ class MessageConsumer:
         finally:
             session.close()  # Zavření session
 
+
     def handle_new_message(self, session, filename, directory, hash, metadata, mass_head, content):
         ''' Zpracování nové zprávy '''
-        message = Files(filename=filename,
-                        directory=directory,
-                        hash=hash,
-                        metadata=metadata,
-                        message_id=mass_head,
-                        kontent=content)
 
-        session.add(message)
-        session.commit()  # Potvrzení změn
+        check = self.check_item_db(hash)
 
-        id_db_row = message.id
-        print(f"Zprava byla uspesne ulozena s metodou 'new' a prirazenym ID z databeze {id_db_row}.")
+        if check:
+            print(f"Soubor s hashem {hash} již existuje v databázi. Nová zpráva nebude uložena.")
+            return  # Ukončete metodu, pokud existuje
 
-        if metadata:  # další informace z metadat do další tabulky
-            file_metadata = FileMetadata(
-                file_id=id_db_row,
-                title=metadata.get('title'),
-                keyword=metadata.get('keyword'),
-                description=metadata.get('description'),
-                content_text=metadata.get('content_text')
-            )
+        try:
+            message = Files(filename=filename,
+                            directory=directory,
+                            hash=hash,
+                            metadata=metadata,
+                            message_id=mass_head,
+                            kontent=content)
 
-            session.add(file_metadata)
-            session.commit()
+            session.add(message)
+            session.commit()  # Potvrzení změn
+
+            id_db_row = message.id
+            print(f"Zprava byla uspesne ulozena s metodou 'new' a prirazenym ID z databeze {id_db_row}.")
+
+            if metadata:  # další informace z metadat do další tabulky
+                file_metadata = FileMetadata(
+                    file_id=id_db_row,
+                    title=metadata.get('title'),
+                    keyword=metadata.get('keyword'),
+                    description=metadata.get('description'),
+                    content_text=metadata.get('content_text')
+                )
+
+                session.add(file_metadata)
+                session.commit()
+        except Exception as e:
+            session.rollback()
+            print(f'Chyba pri zpracovani souboru {e}')
+
 
     def handle_delete_message(self, session, filename, directory):
         ''' Zpracování zprávy pro smazání '''
@@ -173,8 +196,8 @@ class MessageConsumer:
 # Spuštění konzumace zpráv
 # ==========================================================================
 if __name__ == '__main__':
-    database = Database()  # Inicializace databáze
-    consumer = MessageConsumer(database)  # Inicializace konzumenta zpráv
-    consumer.connect()  # Připojení k RabbitMQ
-    consumer.consume_messages()  # Spuštění konzumace zpráv
+    database = Database()                   # Inicializace databáze
+    consumer = MessageConsumer(database)    # Inicializace konzumenta zpráv
+    consumer.connect()                      # Připojení k RabbitMQ
+    consumer.consume_messages()             # Spuštění konzumace zpráv
 

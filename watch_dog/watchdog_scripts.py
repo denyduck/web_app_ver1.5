@@ -197,8 +197,8 @@ class Handler(FileSystemEventHandler):
         directory = self.directory_dog
 
         # Kontrola, zda je zadaná cesta platný adresář
-        if not os.path.isdir(directory):
-            raise ValueError('Zadaný adresář neexistuje nebo není přístupný.')
+       # if not os.path.isdir(directory):
+        #    raise ValueError('Zadaný adresář neexistuje nebo není přístupný.')
 
         # Procházení souborů v adresáři
         for filename in os.listdir(directory):
@@ -234,6 +234,7 @@ class Handler(FileSystemEventHandler):
         )
 
     # ==========================================================================
+
     def simulate_existing_files(self):
         """Projde seznam souborů a simuluje volání on_created pro každý soubor."""
         for file_path in self.pdf_list:

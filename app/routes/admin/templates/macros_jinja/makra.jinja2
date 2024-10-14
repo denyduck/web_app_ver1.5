@@ -111,7 +111,7 @@ SEZNAM MAKER
             </li>
             <li class="nav-item d-flex align-items-center">
               <i class="fa-solid fa-info-circle me-1"></i>
-              <a class="nav-link px-2 link-body-emphasis me-4" href="{{url_for('routes.admin.prohlizet')}}">Prohlížet</a>
+              <a class="nav-link px-2 link-body-emphasis me-4" href="">Prohlížet</a>
             </li>
 
             <!-- Dropdown přepínač dark/light režimu -->
@@ -146,31 +146,87 @@ SEZNAM MAKER
 4. PATIČKA
 ===========================================================
 {% macro footer() %}
+    <footer class="bg-dark text-light py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <!-- O projektu a O firmě -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5 class="text-uppercase">O projektu</h5>
+                    <p class="small text-muted">
+                        Tento projekt slouží ke správě a vyhledávání bezpečnostních listů látek. Naším cílem je zlepšit přístup k důležitým informacím o nebezpečných látkách a jejich bezpečném používání.
+                    </p>
+                </div>
 
-    <div class="container">
-        <ul class="nav justify-content-center border-bottom">
-          <li class="nav-item">
-            <a href="#" class="nav-link px-2 text-muted">O projektu</a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link px-2 text-muted">O firmě</a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link px-2 text-muted">Volné pozice</a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link px-2 text-muted">Volné pozice</a>
-          </li>
-        </ul>
-        <p class="text-center text-muted">&copy; 2024, DM </p>
-    </div>
+                <!-- Rychlé odkazy -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="text-uppercase">Rychlé odkazy</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-muted">O projektu</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-muted">O firmě</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-muted">Volné pozice</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-muted">Kontakt</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Kontakt -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-uppercase">Kontakt</h5>
+                    <ul class="list-unstyled">
+                        <li>
+                            <i class="bi bi-geo-alt-fill me-2"></i> Adresa: Ulice 123, 100 00 Praha
+                        </li>
+                        <li>
+                            <i class="bi bi-telephone-fill me-2"></i> Telefon: +420 123 456 789
+                        </li>
+                        <li>
+                            <i class="bi bi-envelope-fill me-2"></i> Email: info@firma.cz
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Sociální sítě -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-uppercase">Sledujte nás</h5>
+                    <div class="d-flex">
+                        <a href="#" class="text-light me-3">
+                            <i class="bi bi-facebook" style="font-size: 1.5rem;"></i>
+                        </a>
+                        <a href="#" class="text-light me-3">
+                            <i class="bi bi-twitter" style="font-size: 1.5rem;"></i>
+                        </a>
+                        <a href="#" class="text-light me-3">
+                            <i class="bi bi-linkedin" style="font-size: 1.5rem;"></i>
+                        </a>
+                        <a href="#" class="text-light">
+                            <i class="bi bi-instagram" style="font-size: 1.5rem;"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="row mt-4">
+                <div class="col text-center">
+                    <p class="text-muted small">&copy; 2024 DM. Všechna práva vyhrazena. | <a href="#" class="text-muted">Zásady ochrany osobních údajů</a> | <a href="#" class="text-muted">Podmínky užívání</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript knihovny -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Odkaz na tvůj vlastní JavaScript soubor -->
+    <!-- Odkaz na vlastní JavaScript soubor -->
     <script src="{{ url_for('static', filename='js/vendor/my.js') }}"></script>
-
-
 {% endmacro %}
 ===========================================================
 5. SIDEBAR

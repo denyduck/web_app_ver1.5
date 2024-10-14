@@ -76,84 +76,116 @@
             {% endfor %}
           </ul>
         {% else %}
-          <p class="text-center">Žádné výsledky nenalezeny.</p>
+          <!--p class="text-center">Žádné výsledky nenalezeny./p -->
         {% endif %}
       </div>
 
 
       <div class="container">
-        <div class="row mt-5 mb-5">
+        <div class="row" style="margin-top: 100px">
           <!-- Hořlavé -->
           <div class="col">
-            <div class="card h-100 text-center bg-dark text-light shadow-sm border-0 rounded">
+            <div class="card h-100 text-center bg-dark text-light shadow-lg border-0 rounded">
               <div class="card-body">
                 <i class="bi bi-fire" style="font-size: 60px; color: #ff6f00;" title="Hořlavé"></i>
-                <h5 class="card-title mt-3" style="font-size: 1.5rem;">Hořlavé látky</h5>
-                <p class="card-text">Látky, které se mohou snadno vznítit.</p>
+                <h5 class="card-title mt-3" style="font-size: 1.6rem; font-weight: 600;">Hořlavé látky</h5>
+                <p class="card-text">Látky s vysokým rizikem vznícení, vyžadující zvláštní opatrnost při skladování a manipulaci.</p>
               </div>
             </div>
           </div>
 
           <!-- Nebezpečné -->
           <div class="col">
-            <div class="card h-100 text-center bg-dark text-light shadow-sm border-0 rounded">
+            <div class="card h-100 text-center bg-dark text-light shadow-lg border-0 rounded">
               <div class="card-body">
                 <i class="bi bi-exclamation-triangle" style="font-size: 60px; color: #ffc107;" title="Nebezpečné"></i>
-                <h5 class="card-title mt-3" style="font-size: 1.5rem;">Nebezpečné látky</h5>
-                <p class="card-text">Látky, které představují vážné riziko.</p>
+                <h5 class="card-title mt-3" style="font-size: 1.6rem; font-weight: 600;">Nebezpečné látky</h5>
+                <p class="card-text">Látky s potenciálem způsobit vážné škody na zdraví a životním prostředí. Vyžadují přísná bezpečnostní opatření.</p>
               </div>
             </div>
           </div>
 
           <!-- Žíravé -->
           <div class="col">
-            <div class="card h-100 text-center bg-dark text-light shadow-sm border-0 rounded">
+            <div class="card h-100 text-center bg-dark text-light shadow-lg border-0 rounded">
               <div class="card-body">
                 <i class="bi bi-droplet-half" style="font-size: 60px; color: #0dcaf0;" title="Žíravé"></i>
-                <h5 class="card-title mt-3" style="font-size: 1.5rem;">Žíravé látky</h5>
-                <p class="card-text">Látky, které mohou způsobit poleptání.</p>
+                <h5 class="card-title mt-3" style="font-size: 1.6rem; font-weight: 600;">Žíravé látky</h5>
+                <p class="card-text">Látky, které mohou způsobit vážné poleptání kůže a sliznic. Nutné používat ochranné prostředky.</p>
               </div>
             </div>
           </div>
 
           <!-- Výbušné -->
           <div class="col">
-            <div class="card h-100 text-center bg-dark text-light shadow-sm border-0 rounded">
+            <div class="card h-100 text-center bg-dark text-light shadow-lg border-0 rounded">
               <div class="card-body">
                 <i class="bi bi-cloud-lightning" style="font-size: 60px; color: #dc3545;" title="Výbušné"></i>
-                <h5 class="card-title mt-3" style="font-size: 1.5rem;">Výbušné látky</h5>
-                <p class="card-text">Látky, které mohou explodovat při reakci.</p>
+                <h5 class="card-title mt-3" style="font-size: 1.6rem; font-weight: 600;">Výbušné látky</h5>
+                <p class="card-text">Látky, které mohou při nesprávné manipulaci explodovat. Vysoké riziko vyžaduje profesionální zacházení.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-          <!-- Modální okno pro seznam výsledků -->
-      <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="resultsModalLabel">Nalezené PDF soubory</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
-            </div>
-            <div class="modal-body">
-              <ul id="resultsList" class="list-group">
-                <!-- Výsledky budou dynamicky vloženy sem -->
-              </ul>
-            </div>
+
+
+
+
+    <footer class="bg-dark text-light py-3">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center small">
+
+          <!-- Kontakt vlevo -->
+          <div class="d-flex flex-column">
+            <a href="mailto:info@firma.cz" class="text-muted text-decoration-none mb-1">
+              <i class="bi bi-envelope me-1"></i> info@firma.cz
+            </a>
+
+          </div>
+
+          <!-- Copyright a odkazy uprostřed -->
+          <div class="text-center flex-grow-1">
+            <span class="text-muted">&copy; 2024 DM | o projektu</span><br>
+          </div>
+
+          <!-- Sociální sítě vpravo -->
+          <div class="d-flex">
+            <a href="#" class="text-muted me-3">
+              <i class="bi bi-facebook" style="font-size: 1.2rem;"></i>
+            </a>
           </div>
         </div>
       </div>
-
-
-    <footer class="text-center text-lg-start">
-
-      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-        © 2024 Copyright
-      <a class="text-body" href="">DM</a>
-
     </footer>
+
+    <!-- Modální okno pro seznam výsledků -->
+    <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="resultsModalLabel">Nalezené PDF soubory</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+          </div>
+          <div class="modal-body">
+            <ul id="resultsList" class="list-group">
+              <!-- Výsledky budou dynamicky vloženy sem -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- JavaScript knihovny -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Odkaz na vlastní JavaScript soubor -->
+    <script src="{{ url_for('static', filename='js/vendor/my.js') }}"></script>
+
+
+
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
