@@ -13,33 +13,45 @@ document.getElementById('searchField').addEventListener('input', function() {
 
   // AJAX volání pro získání návrhů
   fetch('/autocomplete?query=' + encodeURIComponent(query))
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
     .then(data => {
+      console.log(data);
       const suggestions = document.getElementById('suggestions');
-      suggestions.innerHTML = '';                                  // Vyčisti předchozí návrhy
-      currentFocus = -1;                                           // Resetuj aktuální pozici při novém hledání
+      suggestions.innerHTML = ''; // Vyčisti předchozí návrhy
+      currentFocus = -1; // Resetuj aktuální pozici při novém hledání
 
       // Zpracování návrhů
-      data.forEach((item) => {
-        const suggestionItem = document.createElement('a');
-        suggestionItem.className = 'list-group-item list-group-item-action';
-        suggestionItem.textContent = item.filename;               // Název souboru
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach((item) => {
+          const suggestionItem = document.createElement('a');
+          suggestionItem.className = 'list-group-item list-group-item-action';
+          suggestionItem.textContent = item.filename; // Název souboru
 
-        // Přidání události pro kliknutí na návrh
-        suggestionItem.addEventListener('click', function() {
-          window.open('/pdfs/' + item.filename, '_blank');        // Otevře PDF v novém okně
-          document.getElementById('suggestions').innerHTML = '';  // Vyčisti návrhy
-          document.getElementById('searchField').value = '';      // Vyprázdni vyhledávací pole
-          suggestions.style.display = 'none';                      // Skrýt návrhy po výběru
+          // Přidání události pro kliknutí na návrh
+          suggestionItem.addEventListener('click', function() {
+            window.open('/pdfs/'+ item.filename, '_blank'); // Otevře PDF v novém okně
+            suggestions.innerHTML = ''; // Vyčisti návrhy
+            document.getElementById('searchField').value = ''; // Vyprázdni vyhledávací pole
+            suggestions.style.display = 'none'; // Skrýt návrhy po výběru
+          });
+
+          suggestions.appendChild(suggestionItem);
         });
-
-        suggestions.appendChild(suggestionItem);
-      });
-
-      // Zobraz návrhy, pokud existují
-      suggestions.style.display = data.length ? 'block' : 'none';
+        suggestions.style.display = 'block'; // Zobraz návrhy
+      } else {
+        suggestions.style.display = 'none'; // Skryj, pokud nejsou žádné návrhy
+      }
     })
-    .catch(error => console.error('Chyba při načítání návrhů:', error));
+    .catch(error => {
+      console.error('Chyba při načítání návrhů:', error);
+      document.getElementById('suggestions').innerHTML = 'Chyba při načítání návrhů.';
+      document.getElementById('suggestions').style.display = 'block';
+    });
 });
 
 // Navigace v návrzích pomocí klávesnice
@@ -81,7 +93,7 @@ document.addEventListener('click', function(event) {
 
   // Zkontroluj, zda bylo kliknuto mimo vyhledávací pole nebo našeptávač
   if (!searchField.contains(event.target) && !suggestions.contains(event.target)) {
-    suggestions.style.display = 'none';  // Stejně jako při stisku klávesy Escape
+    suggestions.style.display = 'none'; // Stejně jako při stisku klávesy Escape
   }
 });
 
@@ -112,22 +124,27 @@ function searchFiles() {
 
   // AJAX volání pro získání výsledků
   fetch('/autocomplete?query=' + encodeURIComponent(query))
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
     .then(data => {
       const resultsList = document.getElementById('resultsList');
-      resultsList.innerHTML = '';               // Vyčisti předchozí výsledky
+      resultsList.innerHTML = ''; // Vyčisti předchozí výsledky
 
-      if (data.length > 0) {
+      if (Array.isArray(data) && data.length > 0) {
         // Pro každý nalezený soubor přidáme do seznamu novou položku
         data.forEach((item) => {
           const resultItem = document.createElement('li');
           resultItem.className = 'list-group-item';
-
+f
           // Odkaz na PDF soubor
           const link = document.createElement('a');
           link.href = '/pdfs/' + item.filename;
-          link.target = '_blank';               // Otevře PDF v novém okně
-          link.textContent = item.filename;     // Zobrazí název souboru
+          link.target = '_blank'; // Otevře PDF v novém okně
+          link.textContent = item.filename; // Zobrazí název souboru
 
           resultItem.appendChild(link);
           resultsList.appendChild(resultItem);
@@ -173,5 +190,5 @@ document.getElementById('resultsModal').addEventListener('hidden.bs.modal', func
   // Vyprázdni a skryj našeptávač při zavření modálního okna
   document.getElementById('suggestions').innerHTML = '';
   document.getElementById('suggestions').style.display = 'none';
-  document.getElementById('searchField').focus();
 });
+

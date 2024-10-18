@@ -14,86 +14,96 @@ from sqlalchemy import (Text,
 from shared_models import Base
 from sqlalchemy.orm import relationship
 import enum
-
+import logging
 
 '''
 func.now()                  # Používá funkci now() databázového serveru k získání aktuálního data a času.
 onupdate=func.now())        # změn hodnotu sloupce pokaždé, když je záznam aktualizován a to časem
-
+uselist=False               # říká SQLAlchemy, že se jedná o One-to-One vztah, nikoli o seznam (což je běžné pro One-to-Many). 
+                                Bez této volby by relace očekávala, že pro každý soubor může existovat více záznamů v FileMetadata, 
+                                což by vedlo k One-to-Many vztahu.
 '''
-
 
 # Enum pro typ změny
 class ChangeType(enum.Enum):
     CREATED = "created"
     MODIFIED = "modified"
     DELETED = "deleted"
+class Items(Base):
+    __tablename__ = 'items'
 
-
-#===================================================================================
-# Tabulka `files` zobrazuje informace a aktualni soubory
-#===================================================================================
-
-class Files(Base):
-    __tablename__ = 'files'  # Název tabulky
-
-    id = Column(Integer, primary_key=True)                       # Primární klíč
-    filename = Column(String(255), nullable=False)               # Název souboru
-    directory = Column(String(255), nullable=False)              # Cesta k adresáři
-    hash = Column(String(64))                                    # Hash souboru (např. SHA-256)
-    created_at = Column(TIMESTAMP, server_default=func.now())    # Datum vytvoření, a to přímo v databázi
-    last_modified_at = Column(TIMESTAMP, onupdate=func.now())    # Datum poslední změny
-    size = Column(BigInteger)                                    # Velikost souboru v bajtech
-    is_active = Column(Boolean, default=True)                    # Aktivní status
-    message_id = Column(String(255), nullable=False)             # identifikace zpravy
+    id = Column(Integer, primary_key=True)
+    filename = Column(String(255), nullable=False)
+    directory = Column(String(255), nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    last_modified_at = Column(TIMESTAMP, onupdate=func.now())
+    is_active = Column(Boolean, default=True)
+    message_id = Column(String(255), nullable=False)
+    hash_item = Column(String(64))
+    size = Column(BigInteger, nullable=True)
+    version = Column(Integer)
+    validation_status = Column(String(255))
     kontent = Column(Text)
 
+    changes = relationship('FileChanges', back_populates='item')
 
     def __repr__(self):
-        return f"<Files(id={self.id}, filename={self.filename}, message_id={self.message_id})>"
+        return f"<Items(id={self.id}, filename={self.filename}, is_active={self.is_active})>"
 
 
-    __table_args__ = (
-        Index('idx_fulltext_search', 'kontent', 'filename', mysql_prefix='FULLTEXT'),
-        {'mysql_charset': 'utf8mb4', 'mysql_collate': 'utf8mb4_unicode_ci'}
-    )
+class FileChanges(Base):
+    __tablename__ = 'file_changes'
+
+    id = Column(Integer, primary_key=True)
+    item_id = Column(Integer, ForeignKey('items.id'), nullable=True)
+    file_id = Column(Integer, ForeignKey('files.id'), nullable=True)
+    filename = Column(String(255), nullable=True)
+    changed_at = Column(TIMESTAMP, server_default=func.now())
+    change_type = Column(Enum(ChangeType), nullable=False)
+    old_hash = Column(String(64))
+    new_hash = Column(String(64))
+    old_size = Column(BigInteger)
+    new_size = Column(BigInteger)
+
+    item = relationship('Items', back_populates='changes')
+    file = relationship('Files', back_populates='changes')
+
+    def __repr__(self):
+        return f'<FileChanges(id={self.id}, filename={self.filename}, change={self.change_type})>'
+
+
+class Files(Base):
+    __tablename__ = 'files'
+
+    id = Column(Integer, primary_key=True)
+    filename = Column(String(255), nullable=False)
+    directory = Column(String(255), nullable=False)
+    hash_item = Column(String(64))
+    created_at = Column(TIMESTAMP, server_default=func.now())
+    last_modified_at = Column(TIMESTAMP, onupdate=func.now())
+    size = Column(BigInteger)
+    is_active = Column(Boolean, default=True)
+    message_id = Column(String(255), nullable=False)
+    kontent = Column(Text)
 
     changes = relationship('FileChanges', back_populates='file')
-    file_metadata = relationship('FileMetadata', back_populates='file')
+    file_metadata = relationship('FileMetadata', back_populates='file', uselist=False)
 
-#===================================================================================
-#Tabulka 'File_changes'
-#===================================================================================
-#Tabulka sledující změny jednotlivých souborů. Umožňuje archivovat historii změn pro účely logování.
-
-# Tabulka `file_changes`
-class FileChanges(Base):
-    __tablename__ = 'file_changes'  # Název tabulky
-
-    id = Column(Integer, primary_key=True)                              # Primární klíč
-    file_id = Column(Integer, ForeignKey('files.id'), nullable=True)    # Opravený cizí klíč na Files
-    filename = Column(String(255), nullable=True)  #DOPLNIT POTOM SMAZAT!!
-    changed_at = Column(TIMESTAMP, server_default=func.now())    # Datum změny
-    change_type = Column(Enum(ChangeType), nullable=False)       # Typ změny
-    old_hash = Column(String(64))                                # Původní hash
-    new_hash = Column(String(64))                                # Nový hash
-    old_size = Column(BigInteger)                                # Původní velikost
-    new_size = Column(BigInteger)                                # Nová velikost
+    def __repr__(self):
+        return f"<Files(id={self.id}, filename={self.filename}, hash={self.hash})>"
 
 
-    file = relationship('Files', back_populates='changes')       # Správná relace zpět k Files
-
-# Tabulka `file_metadata`
 class FileMetadata(Base):
     __tablename__ = 'file_metadata'
 
-    id = Column(Integer, primary_key=True)                       # Primární klíč
-    file_id = Column(Integer, ForeignKey('files.id'), nullable=True)  # Opravený cizí klíč na Files
-    title = Column(String(255))                                  # Název
-    keyword = Column(Text)                                       # Klíčová slova
-    description = Column(Text)                                   # Popis
-    content_text = Column(Text)                                  # Obsah textu
+    id = Column(Integer, primary_key=True)
+    file_id = Column(Integer, ForeignKey('files.id'), nullable=True)
+    title = Column(String(255))
+    keyword = Column(Text)
+    description = Column(Text)
+    content_text = Column(Text)
 
+    file = relationship('Files', back_populates='file_metadata')
 
-    file = relationship('Files', back_populates='file_metadata')      # Správná relace zpět k Files
-
+    def __repr__(self):
+        return f"<FileMetadata(id={self.id}, file_id={self.file_id}, title={self.title})>"

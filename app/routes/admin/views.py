@@ -36,18 +36,30 @@ from app.routes.admin import admin_bp
 
 
 # 2. REGISTRACE
+
 @admin_bp.route('/')
 def home():
-    query = request.args.get('query', '').strip()
-    results = []
+    query = request.args.get('query', '').strip()  # Odstraní nadbytečné mezery z query
+    results_list = []  # Inicializace seznamu výsledků
 
-    if query:
-        # Hlavní vyhledávání
+    if query:  # Pokud query není prázdné, provede dotaz
+        # Hlavní vyhledávání v obsahu a názvech souborů
         results = session.query(Files).filter(
             Files.kontent.like(f'%{query}%') | Files.filename.like(f'%{query}%')
         ).all()
 
-    return render_template('home.html', results=results, query=query)
+        if results:  # Pokud jsou nalezeny výsledky, zpracuje je
+            for r in results:
+                results_list.append({
+                    'filename': r.filename,    # Přidá název souboru
+                    'directory': r.directory,  # Přidá adresář
+                    'content': r.kontent       # Přidá obsah souboru (pokud je potřeba)
+                })
+
+    # Renderuje šablonu a předává výsledky a query
+    return render_template('home.html', results=results_list, query=query)
+
+    # Pokud není dotaz, vrátíme prázdný seznam
 
 @admin_bp.route('/autocomplete')
 def autocomplete():

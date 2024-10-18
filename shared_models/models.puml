@@ -1,0 +1,79 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+enum ChangeType {
+    CREATED
+    MODIFIED
+    DELETED
+}
+
+' Třída Items reprezentuje trvalé záznamy souborů (historie)
+class Items {
+    +id: Integer <<PK>>
+    +filename: String
+    +directory: String
+    +created_at: TIMESTAMP
+    +last_modified_at: TIMESTAMP
+    +is_active: Boolean <<default=True>>
+    +message_id: String
+    +kontent: Text
+    +hash: String(64)
+    +size: BigInteger
+    +version: Integer  ' Umožní správu verzí souborů
+    +validation_status: String ' Validace integrity souboru
+    --
+    +file_changes: List<FileChanges>
+    +file_metadata: List<FileMetadata>
+}
+
+
+' Uchovává změny souborů (log změn)
+class FileChanges {
+    +id: Integer <<PK>>
+    +item_id: Integer <<FK>>    ' Odkaz na soubor v tabulce Items
+    +filename: String
+    +changed_at: TIMESTAMP
+    +old_size: BigInteger
+    +new_size: BigInteger
+    +change_type: Enum(ChangeType)
+    +old_hash: String(64)
+    +new_hash: String(64)
+}
+
+' Aktuální soubory s detailními informacemi o stavu souboru
+class Files {
+    +id: Integer <<PK>>
+    +item_id: Integer <<FK>>  ' Odkaz na odpovídající záznam v Items
+    +filename: String
+    +directory: String
+    +hash: String(64)
+    +created_at: TIMESTAMP
+    +last_modified_at: TIMESTAMP
+    +size: BigInteger
+    +is_active: Boolean <<default=True>>
+    +message_id: String
+    +kontent: Text
+    --
+    +metadata: List<FileMetadata>  ' Odkaz na metadata
+}
+
+' Metadata souborů
+class FileMetadata {
+    +id: Integer  <<PK>>
+    +file_id: Integer  <<FK>> ' Odkaz na aktuální soubor
+    +title: String
+    +keyword: Text
+    +description: Text
+    +content_text: Text
+}
+
+
+' Vztahy mezi třídami
+Items "1" *-- "0..*" FileChanges : history
+Items "1" *-- "0..*" Files : contains
+Files "1" *-- "0..*" FileMetadata : has metadata
+FileChanges --> Items: references
+FileMetadata --> Files: references
+
+@enduml
