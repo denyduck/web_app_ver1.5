@@ -11,6 +11,8 @@ document.getElementById('searchField').addEventListener('input', function() {
     return;
   }
 
+
+
   // AJAX volání pro získání návrhů
   fetch('/autocomplete?query=' + encodeURIComponent(query))
     .then(response => {
@@ -34,7 +36,7 @@ document.getElementById('searchField').addEventListener('input', function() {
 
           // Přidání události pro kliknutí na návrh
           suggestionItem.addEventListener('click', function() {
-            window.open('/pdfs/'+ item.filename, '_blank'); // Otevře PDF v novém okně
+            window.open(item.directory + '/' + item.filename, '_blank'); // Otevře PDF v novém okně
             suggestions.innerHTML = ''; // Vyčisti návrhy
             document.getElementById('searchField').value = ''; // Vyprázdni vyhledávací pole
             suggestions.style.display = 'none'; // Skrýt návrhy po výběru
@@ -110,6 +112,9 @@ function setActive(items) {
   }
 }
 
+
+
+
 // Funkce pro spuštění vyhledávání (použitá jak pro tlačítko, tak pro klávesu Enter)
 function searchFiles() {
   let query = document.getElementById('searchField').value;
@@ -122,7 +127,7 @@ function searchFiles() {
     return;
   }
 
-  // AJAX volání pro získání výsledků
+  // AJAX volání pro získání výsledků do modalu
   fetch('/autocomplete?query=' + encodeURIComponent(query))
     .then(response => {
       if (!response.ok) {
@@ -139,10 +144,9 @@ function searchFiles() {
         data.forEach((item) => {
           const resultItem = document.createElement('li');
           resultItem.className = 'list-group-item';
-f
           // Odkaz na PDF soubor
           const link = document.createElement('a');
-          link.href = '/pdfs/' + item.filename;
+          link.href = item.directory + '/' + item.filename;
           link.target = '_blank'; // Otevře PDF v novém okně
           link.textContent = item.filename; // Zobrazí název souboru
 

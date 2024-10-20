@@ -16,6 +16,7 @@ a z base_outside.
     2.3 *Testování BASE pred nasazením
 
 '''
+import logging
 
 '''
 REGISTRUJ STRANKY DO BP ADMIN
@@ -30,9 +31,10 @@ REGISTRUJ STRANKY DO BP ADMIN
 # 1. IMPORTY
 from flask import render_template, request, jsonify
 from shared_models.rabbit_models import Files
-from shared_models import session
+from shared_models import session,Session
 from app.routes.admin import admin_bp
 
+import re
 
 
 # 2. REGISTRACE
@@ -63,17 +65,30 @@ def home():
 
 @admin_bp.route('/autocomplete')
 def autocomplete():
+
+
     query = request.args.get('query', '').strip().lower()
     results = []
 
-    if query:
-        # Vyhledávání na základě názvu souboru nebo obsahu
-        results = session.query(Files).filter(
-            Files.filename.like(f'%{query}%') | Files.kontent.like(f'%{query}%')
-        ).all()
+    session = Session() # vytvoreni nove session pro okamzity progres
+    try:
+        if query:
+            # Vyhledávání na základě názvu souboru nebo obsahu
+            results = session.query(Files).filter(
+                Files.filename.like(f'%{query}%') | Files.kontent.like(f'%{query}%')
+            ).all()
+            logging.info("Nalezene vysledky: %s", results)
+    finally:
+        session.close()
 
-    # Vrátíme návrhy jako JSON
-    return jsonify([{'filename': file.filename, 'kontent': file.kontent[:200]} for file in results])
+    # Vrátíme návrhy jako JSON, včetně 'directory'
+    return jsonify([
+        {
+            'filename': file.filename,
+            'kontent': file.kontent[:200] if file.kontent else '',
+            'directory': file.directory[file.directory.find('/pdfs/'):] if file.directory.find('/pdfs/') != -1 else '/pdfs/'# Udržuje vše od /pdfs/ a dál a pokud se nenajde vrati /pdfs/
+        } for file in results
+    ])
 
 
 @admin_bp.route('/prohlizet')
@@ -83,10 +98,6 @@ def prohlizet():
 @admin_bp.route('/intra')
 def intra():
     return render_template('intra.html')
-
-
-
-
 
 #===================================================================================#
 # 2.3 Testovani - pri nepouzvani ZAKOMENTOVAT

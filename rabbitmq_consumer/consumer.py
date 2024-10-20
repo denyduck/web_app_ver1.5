@@ -152,72 +152,67 @@ class MessageConsumer:
     # ==========================================================================
     def handle_new_message(self, session, file_id, filename, directory, hash_item, metadata, size, content):
         ''' Zpracování nové zprávy '''
-        # zkontroluj co je v adresari pri zapnuti watchdoga
+        # Kontroluj existenci položky v databázi podle hash_item
         check = self.check_item_db(hash_item)
-        print()
         if check:
             print(f"Soubor s hashem {hash_item} již existuje v databázi. Nová zpráva nebude uložena.")
             return  # Ukončete metodu, pokud existuje
 
         try:
+            # Ověřte, že metadata jsou správně naformátována jako slovník
             if isinstance(metadata, str):
-                metadata = json.loads(metadata) # prevede json stringu na dic
-            elif not isinstance(metadata,dict):
-                raise ValueError('Metada musi byt string nebo slovnik')
+                metadata = json.loads(metadata)  # Převede JSON string na dict
+            elif not isinstance(metadata, dict):
+                raise ValueError('Metadata musí být string nebo slovník')
 
-            item = Items(filename=filename,
-                            directory=directory,
-                            hash_item=hash_item,
-                            metadata=metadata,
-                            kontent=content,
-                            message_id=file_id,
-                            size=size
-                            )
-            session.add(item)
-            session.commit()  # Potvrzení změn
+            # Vytvoření nové položky v tabulce Items
+            item = Items(
+                filename=filename,
+                directory=directory,
+                hash_item=hash_item,
+                metadata=metadata,
+                kontent=content,
+                message_id=file_id,
+                size=size
+            )
+            session.add(item)  # Přidá do session
 
-
-            file = Files(filename=filename,
-                            directory=directory,
-                            hash_item=hash_item,
-                            metadata=metadata,
-                            kontent=content,
-                            message_id=file_id,
-                            size=size
-                            )
-            session.add(item)
-            session.add(file)
-            session.commit()  # Potvrzení změn
-
-
-
-            id_db_row = item.id
-            print(f"Zprava byla uspesne ulozena s metodou 'new' a prirazenym ID z databeze {id_db_row}.")
-           # Debugging: zkontroluj typ a obsah metadat
-            print(f"Typ metadat: {type(metadata)}")
-            print(f"Obsah metadat: {metadata}")
-
+            # Vytvoření nové položky v tabulce Files
             existing_file = session.query(Files).filter(Files.hash_item == hash_item).first()
-            if not existing_file:
-                print(f'Soubor s hashem {hash_item} neexistuje. Metadata nebudou uložena')
+            if existing_file:
+                print(f"Soubor s hashem {hash_item} již existuje v tabulce Files.")
+                return
 
+            file = Files(
+                filename=filename,
+                directory=directory,
+                hash_item=hash_item,
+                metadata=metadata,
+                kontent=content,
+                message_id=file_id,
+                size=size
+            )
+            session.add(file)
+            session.commit()  # Potvrzení změn v databázi
 
-            #POZOR NA DATOVY TYP!! prijima pouze slovnik!
-            if metadata:  # další informace z metadat do další tabulky
+            print(f"Zpráva byla úspěšně uložena s ID: {item.id}.")
+
+            # Ukládání metadat, pokud existují
+            if metadata:
                 file_metadata = FileMetadata(
-                    file_id=existing_file.id,
+                    file_id=file.id,  # Použití `file.id`, protože teď je commitnuto
                     title=metadata.get('title'),
                     keyword=metadata.get('keyword'),
                     description=metadata.get('description'),
                     content_text=metadata.get('content_text')
                 )
-
                 session.add(file_metadata)
                 session.commit()
                 print(f"Metadata byla úspěšně uložena s ID: {file_metadata.id}")
+
         except Exception as e:
-            session.rollback()
-            print(f'Chyba pri zpracovani souboru v def handle_new_message {e}')
+            session.rollback()  # Rollback při chybě
+            print(f'Chyba při zpracování souboru: {e}')
 
     # ==========================================================================
     def handle_delete_message(self, session, filename, directory, hash_item, size):

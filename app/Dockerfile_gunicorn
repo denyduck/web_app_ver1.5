@@ -19,4 +19,4 @@ COPY . .
 ENV PYTHONPATH="/usr/src:${PYTHONPATH}"
 
 # Spuštění Gunicorn serveru
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "run:app"]
+CMD ["gunicorn", "--reloaded","--bind", "0.0.0.0:8000", "run:app"]
