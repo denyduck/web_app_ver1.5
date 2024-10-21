@@ -273,3 +273,34 @@ font-size: 1.5rem; /* Velikost ikony lupy */
     -o-transform: translateY(-5px); /* Opera */
     -ms-transform: translateY(-5px); /* IE */
 }
+
+
+/* Styl pro loader */
+.loader {
+  position: fixed; /* Zajišťuje, že loader je vždy v popředí */
+  top: 50%; /* Umístí loader na střed obrazovky */
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centering */
+  text-align: center; /* Centering text */
+  z-index: 1000; /* Zajišťuje, že loader je nad ostatními prvky */
+  background: rgba(255, 255, 255, 0.8); /* Poloprůhledné pozadí */
+  border-radius: 8px; /* Zaoblené rohy */
+  padding: 20px; /* Vnitřní okraje */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Stín */
+}
+
+/* Styl pro spinner */
+.spinner {
+  border: 5px solid #f3f3f3; /* Světlejší barva */
+  border-top: 5px solid #3498db; /* Tmavší barva */
+  border-radius: 50%; /* Kulatý tvar */
+  width: 30px; /* Šířka spinneru */
+  height: 30px; /* Výška spinneru */
+  animation: spin 1s linear infinite; /* Animace rotace */
+}
+
+/* Animace pro rotaci */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

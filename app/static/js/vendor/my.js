@@ -1,5 +1,11 @@
 let currentFocus = -1; // Pro sledování aktuální pozice ve výběru
 
+
+// Funkce pro umístění kurzoru do vyhledávacího pole
+function focusOnSearchField() {
+  document.getElementById('searchField').focus();
+}
+
 // Načítání návrhů na základě vstupu uživatele
 document.getElementById('searchField').addEventListener('input', function() {
   let query = this.value;
@@ -10,8 +16,6 @@ document.getElementById('searchField').addEventListener('input', function() {
     document.getElementById('suggestions').style.display = 'none';
     return;
   }
-
-
 
   // AJAX volání pro získání návrhů
   fetch('/autocomplete?query=' + encodeURIComponent(query))
@@ -40,6 +44,7 @@ document.getElementById('searchField').addEventListener('input', function() {
             suggestions.innerHTML = ''; // Vyčisti návrhy
             document.getElementById('searchField').value = ''; // Vyprázdni vyhledávací pole
             suggestions.style.display = 'none'; // Skrýt návrhy po výběru
+            focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
           });
 
           suggestions.appendChild(suggestionItem);
@@ -74,6 +79,8 @@ document.getElementById('searchField').addEventListener('keydown', function(e) {
   } else if (e.key === 'Enter') {
     // Potvrzení klávesou Enter
     e.preventDefault();
+    focusOnSearchField()
+
 
     // Pokud je v našeptávači vybrána nějaká položka, vyber ji
     if (currentFocus > -1 && items[currentFocus]) {
@@ -81,10 +88,13 @@ document.getElementById('searchField').addEventListener('keydown', function(e) {
     } else {
       // Pokud není vybrán žádný návrh, spustí se vyhledávání stejně jako při kliknutí na tlačítko "Hledat"
       searchFiles();
+      focusOnSearchField()
+
     }
   } else if (e.key === 'Escape') {
     // Zavření návrhů klávesou Escape
     suggestions.style.display = 'none';
+    focusOnSearchField()
   }
 });
 
@@ -96,6 +106,7 @@ document.addEventListener('click', function(event) {
   // Zkontroluj, zda bylo kliknuto mimo vyhledávací pole nebo našeptávač
   if (!searchField.contains(event.target) && !suggestions.contains(event.target)) {
     suggestions.style.display = 'none'; // Stejně jako při stisku klávesy Escape
+    focusOnSearchField()
   }
 });
 
@@ -112,9 +123,6 @@ function setActive(items) {
   }
 }
 
-
-
-
 // Funkce pro spuštění vyhledávání (použitá jak pro tlačítko, tak pro klávesu Enter)
 function searchFiles() {
   let query = document.getElementById('searchField').value;
@@ -124,6 +132,7 @@ function searchFiles() {
     document.getElementById('resultsList').innerHTML = '<li class="list-group-item">Zadejte hledaný název.</li>';
     const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
     resultsModal.show();
+    focusOnSearchField(); // Umístí kurzor do vyhledávacího pole
     return;
   }
 
@@ -164,6 +173,7 @@ function searchFiles() {
 
       // Vyprázdni vyhledávací pole po zobrazení výsledků
       document.getElementById('searchField').value = '';
+      focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
     })
     .catch(error => {
       console.error('Chyba při vyhledávání:', error);
@@ -173,26 +183,26 @@ function searchFiles() {
 
       // Vyprázdni vyhledávací pole i v případě chyby
       document.getElementById('searchField').value = '';
+      focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
     });
 }
 
 // Vyhledávání po kliknutí na tlačítko "Hledat"
 document.getElementById('searchButton').addEventListener('click', function() {
   searchFiles();
+  focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
 });
 
 // Umístění kurzoru do vyhledávacího pole při načtení stránky
 window.addEventListener('load', function() {
   // Vyprázdnění vyhledávacího pole a odstranění posledního hledání
   localStorage.removeItem('lastSearch'); // Odstranění posledního hledání
-  document.getElementById('searchField').value = ''; // Vyprázdní vyhledávací pole
-  document.getElementById('searchField').focus(); // Umístí kurzor do vyhledávacího pole
+  focusOnSearchField(); // Umístí kurzor do vyhledávacího pole
 });
 
 // Přidání události pro zavření modálu
 document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
-  // Vyprázdni a skryj našeptávač při zavření modálního okna
-  document.getElementById('suggestions').innerHTML = '';
-  document.getElementById('suggestions').style.display = 'none';
+  document.getElementById('suggestions').innerHTML = ''; // Vyprázdnění návrhů
+  document.getElementById('suggestions').style.display = 'none'; // Skrytí návrhů po zavření
+  focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
 });
-
