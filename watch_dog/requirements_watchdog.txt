@@ -10,3 +10,8 @@ mysql-connector-python
 # konvert pdf na image
 pdf2image
 pytesseract
+
+SQLAlchemy==2.0.35
+flask-sqlalchemy
+flask_migrate
+pymysql==1.1.1

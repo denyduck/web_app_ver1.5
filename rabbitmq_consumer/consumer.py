@@ -67,17 +67,17 @@ class MessageConsumer:
         ''' Zkontroluje, zda položka s daným hashem existuje v databázi. '''
 
         try:
+            # Debugovací výstup pro sledování, co bylo hledáno
+            print(f'Hledá se položka s hashem: {hash_item}')
             # Vyhledáme existující položku podle jejího hashe
             existing_file = self.session.query(Items).filter(Items.hash_item == hash_item).first()
 
-            # Debugovací výstup pro sledování, co bylo hledáno
-            print(f'Hledá se položka s hashem: {hash_item}')
 
             # Zjistíme, zda položka existuje
             if existing_file:
-                print(f'Položka s hashem {hash_item} byla nalezena v databázi.')
+                print(f'Položka s tímto hashem: {hash_item} byla nalezena v databázi.')
             else:
-                print(f'Položka s hashem {hash_item} nebyla nalezena v databázi.')
+                print(f'Položka s tímto hashem: {hash_item} nebyla nalezena v databázi.')
 
             # Vrátíme True, pokud položka existuje, jinak False
             return existing_file is not None
@@ -90,33 +90,39 @@ class MessageConsumer:
     # ==========================================================================
     def callback_outcoming(self, ch, method, properties, body):
         ''' Zpracování příchozí zprávy '''
+
         # Získání ID a metody zprávy z hlavičky
         mass_head = properties.headers.get('message_id')
         method_type = properties.headers.get('method')
 
         print(f"Hlavička - zprava_id: {mass_head}, s metodou: {method_type}")
 
-        # Dekódování těla zprávy
+        # Dekóduj tělo zprávy
         message_content = body.decode()
         print(f"Dekodovaní těla zprávy: {message_content}")
 
-        # Extrakce dat ze zprávy
+        # Extrahuj data ze zprávy
         try:
-            # Zde zkontrolujte, zda extract_message_from_json vrací správný počet hodnot
+            # Nejdříve zkontroluj, zda extract_message_from_json vrací správný počet hodnot a ulož do proměnné
             extracted_data = extract_message_from_json(message_content)
-
             # Debugging print pro kontrolu extrahovaných dat
             print(f"Extrahovaná data: {extracted_data}")
-
             # Ujistěte se, že máte správný počet položek
-            if len(extracted_data) != 8:
-                raise ValueError(f"Expected 8 items but got {len(extracted_data)}: {extracted_data}")
-
+            if len(extracted_data) != 8:    # a pokud je jiný než 8
+                raise ValueError(f"Očekávám 8 položek ale dostávám {len(extracted_data)}: {extracted_data}")
+            # rozbal data z proměné extracted_data typu JSON
             file_id, filename, directory, hash_item, change_type, metadata, size, content = extracted_data
+            # preved mi metadat na slovnik
+            if isinstance(metadata, str):
+                try:
+                    metadata = json.loads(metadata) # nyni jsou prevedeny na platny slovnik
+                except json.JSONDecodeError:
+                    print("Chyba: Metadata nejsou platný JSON formát.")
+                    return
 
-
+            # zpřístupni mi filename v celé třídě
             self.file_pdf_path = filename
-
+            self.metadata = metadata
             # Výpis jednotlivých položek pro debug
             print(f"Extracted message - ID: {file_id}")
             print(f"Filename: {filename}")
@@ -129,22 +135,28 @@ class MessageConsumer:
 
         except Exception as e:
             print(f"Chyba při extrakci dat: {e}")
-            return  # Můžete se rozhodnout, zda chcete pokračovat nebo ne
+            return
 
-        ''' Zpracování do databáze podle hlavičky zprávy '''
-        session = self.database.Session()  # Otevři novou session
+        # Otevři novou session a pro použití ji ulož do proměnné
+        session = self.database.Session()
 
         try:
-            if method_type == 'new':
+
+            if method_type == "CREATED":
                 self.handle_new_message(session, file_id, filename, directory, hash_item, metadata, size, content)
 
-            elif method_type == 'del':
+            elif method_type == "DELETED":
+                self.edit_item_status(session, filename, directory)
                 self.handle_delete_message(session, filename, directory, hash_item, size)
-            elif method_type == 'edit':
+
+            elif method_type == "MODIFIED": # dodelat metoddu edita
                 self.handle_edit_message(session, message_content, filename, hash_item)
 
+            elif method_type == "RENAMED":
+                self.handle_rename_message(session)
+
         except Exception as e:
-            session.rollback()  # V případě chyby vrátíme změny zpět
+            session.rollback()  # V případě chyby mi vrat data zpět
             print(f"Chyba při zpracování: {e}")
         finally:
             session.close()  # Zavření session
@@ -152,21 +164,24 @@ class MessageConsumer:
     # ==========================================================================
     def handle_new_message(self, session, file_id, filename, directory, hash_item, metadata, size, content):
         ''' Zpracování nové zprávy '''
-        # Kontroluj existenci položky v databázi podle hash_item
+
+        # Zkontroluj položku pomoci metody check_item_db s parametrem hash_item
         check = self.check_item_db(hash_item)
-        if check:
+
+        if check:   # pokud položka true vrat informaci
             print(f"Soubor s hashem {hash_item} již existuje v databázi. Nová zpráva nebude uložena.")
             return  # Ukončete metodu, pokud existuje
 
         try:
-            # Ověřte, že metadata jsou správně naformátována jako slovník
+            # Ověřmi, že metadata jsou správně naformátována jako slovník:
             if isinstance(metadata, str):
                 metadata = json.loads(metadata)  # Převede JSON string na dict
+            # pokud jsou jineho datoveho typu nez slovnik:
             elif not isinstance(metadata, dict):
                 raise ValueError('Metadata musí být string nebo slovník')
 
-            # Vytvoření nové položky v tabulce Items
-            item = Items(
+            # Vytvoř novou instanci s atributem self
+            self.item = Items(
                 filename=filename,
                 directory=directory,
                 hash_item=hash_item,
@@ -175,27 +190,39 @@ class MessageConsumer:
                 message_id=file_id,
                 size=size
             )
-            session.add(item)  # Přidá do session
+            # přidej proměnnou item jako parametr metode add
+            session.add(self.item)
 
-            # Vytvoření nové položky v tabulce Files
+            # Vytvoř novou položku v tabulce Files
+            # nejdriv se připoj do db a najdi položku podle hash_item
             existing_file = session.query(Files).filter(Files.hash_item == hash_item).first()
+            # kdyz ji najdes, existuje vrat:
             if existing_file:
+                # vrat mi debug pro informace
                 print(f"Soubor s hashem {hash_item} již existuje v tabulce Files.")
-                return
 
+
+            # zkontroluj jestli nahravany soubor se stejnou hash_item ma rozdilne filename a pokud ano, jde o prejmeneovani stavajiciho soboru
+
+            # ziskani polozky z Items ktera odpovida hash
+
+
+            # Vytvor novou polozku pro tabulku Files a vrat ji promenne file
             file = Files(
                 filename=filename,
                 directory=directory,
                 hash_item=hash_item,
-                metadata=metadata,
+                metadata=metadata,  # datovy typ slvonik
                 kontent=content,
                 message_id=file_id,
                 size=size
             )
             session.add(file)
-            session.commit()  # Potvrzení změn v databázi
 
-            print(f"Zpráva byla úspěšně uložena s ID: {item.id}.")
+            # Potvrzení změn pro vsechny zmeny v databázi
+            session.commit()
+
+            print(f"Zpráva byla úspěšně uložena s ID: {self.item.id}.")
 
             # Ukládání metadat, pokud existují
             if metadata:
@@ -215,20 +242,78 @@ class MessageConsumer:
             print(f'Chyba při zpracování souboru: {e}')
 
     # ==========================================================================
+    def handle_rename_message(self, session):
+        ''' Zpracování zprávy pro přejmenování souboru '''
+        ## vem stary nazev a vyhledej ho v databazi
+        # vrat stary naze v z metadat
+        data = self.metadata
+        filename = self.file_pdf_path # puvodni nazev
+        print(f"otestuj cesti s nazvem souboru: {filename}")
+        # ted z metadat uloz novy nazev
+        new_filename = data.get('new_filename',"Žáadné jméno") #v pripade jej pojmenuj
+
+        # Vyhledání záznamu podle `old_filename`
+        query_file = session.query(Files).filter_by(filename=filename).first()
+
+        # Ověření, zda existuje záznam s `old_filename`
+        if query_file:
+            print(f"Požadavek na přejmenování z '{filename}' na '{new_filename}' byl zaznamenán.")
+
+            try:
+                # Zaznamenání změny názvu do tabulky `FileChanges`
+                change_record = FileChanges(
+                    filename=query_file.filename,
+                    change_type=ChangeType.RENAMED,
+                    old_hash=query_file.hash_item,
+                    new_hash=query_file.hash_item,  # hash zůstává stejný
+                    old_size=query_file.size,
+                    new_size=query_file.size  # velikost zůstává stejná
+                )
+                session.add(change_record)
+
+                # Aktualizace názvu souboru v tabulce `Files`
+                query_file.filename = new_filename
+                session.commit()  # Potvrzení všech změn
+
+                print(f"Soubor byl úspěšně přejmenován na '{new_filename}'.")
+            except Exception as e:
+                session.rollback()  # Vrácení změn v případě chyby
+                print(f'Chyba při přejmenovávání souboru: {e}')
+        else:
+            print(f"Soubor s názvem '{new_filename}' nebyl nalezen v databázi.")
+    # ==========================================================================
+    def edit_item_status(self,session, filename, directory):
+        ''' Aktualizace stavu položky na "no_active" pri smazani'''
+
+        # Načtu odpovídající záznam z tabulky Items
+        existing_item = session.query(Items).filter(Items.filename == filename, Items.directory == directory).first()
+
+        if existing_item:
+            print(f"Nšel jsem: {existing_item.filename}, a je {existing_item.is_active}. Měním na inactiv")
+            existing_item.is_active = "in_active"  # Změň stav na "no_active"
+            print(f"Položka {existing_item.is_active} je nyní neaktivní a bude smazána")
+            session.add(existing_item)  # Přidání změněného objektu do session
+            session.commit()  # Potvrzení změn
+            print(f"Status položky '{existing_item.filename}' byl úspěšně aktualizován na 'no_active'.")
+        else:
+            print(f"Položka {filename} nebyla nalezena v tabulce Items.")
+
+    # ==========================================================================
     def handle_delete_message(self, session, filename, directory, hash_item, size):
         ''' Zpracování zprávy pro smazání souboru '''
 
-        # Vyhledáme existující soubor podle filename a directory,
-        # protože smazaný soubor nemůže mít vypočtený hash.
+        # Vyhledám existující soubor podle filename a directory v tabulce Files
         existing_file = session.query(Files).filter(Files.filename == filename, Files.directory == directory).first()
 
-        # Pokud soubor existuje v databázi
+
+        # Pokud soubor existuje v tabulce Files
         if existing_file:
-            # Uložíme původní hash souboru, abychom ho mohli zaznamenat jako "starý hash" ve změnovém záznamu.
+            # Uložím původní hash souboru, abych ho mohl zaznamenat jako "starý hash" ve změnovém záznamu.
             file_hash = existing_file.hash_item
-            # Uložíme původní velikost souboru pro změnový záznam.
+            # Uložím původní velikost souboru pro změnový záznam.
             file_size = existing_file.size
-            # Vytvoříme nový záznam o změně v tabulce FileChanges.
+
+            # Vytvořím nový záznam o změně v tabulce FileChanges.
             change_record = FileChanges(
                 filename=filename,  # Původní název souboru, který je smazán.
                 change_type=ChangeType.DELETED,  # Typ změny (smazání).
@@ -237,24 +322,22 @@ class MessageConsumer:
                 old_size=file_size,  # Původní velikost souboru, který je smazán.
                 new_size=None  # Žádná nová velikost, protože soubor je smazán.
             )
-
-            # Přidáme záznam o změně do databáze.
+            # Přidám záznam o změně do databáze.
             session.add(change_record)
 
-            # Poté, co zaznamenáme změnu, můžeme bezpečně smazat soubor z tabulky Files.
+            # Smažu soubor z tabulky Files.
             session.delete(existing_file)
 
-            # Potvrzení změn v databázi, které zahrnují přidání záznamu do FileChanges a smazání souboru.
+            # Potvrzení všech změn v databázi.
             session.commit()
 
-            # Vypíšeme potvrzovací zprávu o úspěšném smazání souboru a zaznamenání změny.
-            print(
-                f"Soubor s hashi '{file_hash}' v adresáři '{directory}' byl úspěšně smazán a změna byla zaznamenána.")
+            # Vypíš potvrzovací zprávu o úspěšném smazání souboru a zaznamenání změny.
+            print(f"Soubor s hashi '{file_hash}' v adresáři '{directory}' byl úspěšně smazán a změna byla zaznamenána.")
         else:
-            # Pokud soubor nebyl nalezen, vrátíme chybovou zprávu.
+            # Pokud soubor nebyl nalezen, vrátím chybovou zprávu.
             print(f"Soubor s hash_item '{filename}' v adresáři '{directory}' nebyl nalezen.")
-
     #==========================================================================
+
     def handle_edit_message(self, session, message_content, filename, hash_item):
         ''' Zpracování zprávy pro editaci '''
         message_to_edit = session.query(Files).filter_by(message_content=message_content).first()

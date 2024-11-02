@@ -29,6 +29,8 @@ class ChangeType(enum.Enum):
     CREATED = "created"
     MODIFIED = "modified"
     DELETED = "deleted"
+    RENAMED = "rename"
+
 class Items(Base):
     __tablename__ = 'items'
 
@@ -37,9 +39,9 @@ class Items(Base):
     directory = Column(String(255), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
     last_modified_at = Column(TIMESTAMP, onupdate=func.now())
-    is_active = Column(Boolean, default=True)
+    is_active = Column(String(64), default="active")
     message_id = Column(String(255), nullable=False)
-    hash_item = Column(String(64))
+    hash_item = Column(String(64), nullable=True)
     size = Column(BigInteger, nullable=True)
     version = Column(Integer)
     validation_status = Column(String(255))
@@ -82,7 +84,6 @@ class Files(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
     last_modified_at = Column(TIMESTAMP, onupdate=func.now())
     size = Column(BigInteger)
-    is_active = Column(Boolean, default=True)
     message_id = Column(String(255), nullable=False)
     kontent = Column(Text)
 

@@ -13,12 +13,13 @@ import json
 from config_watchdog import docker_or_local
 
 # Import pro zpracování událostí systému souborů
-from watchdog.events import FileSystemEventHandler          # Zpracovává události (např. změna souborů)
+from watchdog.events import FileSystemEventHandler, FileMovedEvent          # Zpracovává události (např. změna souborů)
 from watchdog.observers.polling import PollingObserver      # Sledování změn souborového systému
 
 # Importuje moduly pro generování unikátních ID
 import uuid
 
+from shared_models.rabbit_models import ChangeType
 
 from message_handler import FileEventSender
 
@@ -245,15 +246,33 @@ class RabbitMQConnection:
 import hashlib
 
 
+'''
+Třída `Handler` je určena pro sledování událostí souborového systému. 
+
+Používá se v ní `FileSystemEventHandler` pro zachycení změn v konkrétním adresáři. Tato třída také podporuje ukládání PDF souborů nalezených v adresáři a odesílání zpráv do fronty RabbitMQ. 
+
+Hlavní atributy třídy:
+- `directory_dog`: Nastavuje se při inicializaci, slouží k uložení cesty k adresáři, kde probíhá sledování. Hodnota je určena funkcí `docker_or_local()`, která nastavuje adresář podle prostředí (Docker nebo lokální).
+- `pdf_list`: Prázdný seznam, který uchovává cesty nalezených PDF souborů. Tento seznam se plní při kontrole adresáře pomocí metody `check_directory`.
+- `rabbit_connection`: Uchovává instanci připojení k RabbitMQ, kterou třída využívá k odesílání zpráv.
+- `filename`: Uchovává název aktuálního zpracovávaného souboru (nastavuje se dynamicky během použití).
+
+Metody:
+- `__init__`: Konstruktor třídy `Handler`. Inicializuje výchozí hodnoty a atributy instance.
+- `check_directory`: Kontroluje platnost adresáře a prohledává všechny podadresáře pro PDF soubory, které následně přidává do `pdf_list`.
+- 'comput_file_hash': 
+'''
+
+
 class Handler(FileSystemEventHandler):
 
+    '''definuj ATRIBUTY INSTANCE'''
     def __init__(self):
         self.directory_dog = docker_or_local()          # Inicializace v konstruktoru
         self.pdf_list = []                              # Seznam pro ukládání nalezených PDF souborů, (soubory ulozen ypred spustenim)
         self.rabbit_connection = RabbitMQConnection()   # Inicializace pripojeni RabbitMq
-
+        self.filename = None                                   # Naplni se pozdeji
     # ==========================================================================
-
     def check_directory(self):
         directory = self.directory_dog
 
@@ -281,6 +300,7 @@ class Handler(FileSystemEventHandler):
         :param file_path: Cesta k souboru, který chcete hashovat.
         :return: Hash souboru ve formátu hexadecimálního řetězce.
         """
+
         sha256_hash = hashlib.sha256()
         # Otevři soubor v binárním režimu pro čtení dat
         with open(file_path, 'rb') as f:
@@ -301,83 +321,107 @@ class Handler(FileSystemEventHandler):
             print(f"Nastala chyba při získávání velikosti souboru: {e}")
             return None
 
-    # ==========================================================================
-    # wrapper pro zpravu
-    def init_message(self, event, change_type, description, directory_path):
-
-        file_id = str(uuid.uuid4())
-        filename = event.src_path.split("/")[-1]
-        directory = directory_path.rsplit("/", 1)[0]
-        hash_item = self.comput_file_hash(event.src_path) if change_type != 'del' else None
-        pdf_processor = Pdf_processor()
-        kontent = pdf_processor.proces_pdf(event.src_path) if change_type in ['new', 'edit'] else None
-        size = self.get_file_size(self.directory_dog)
-
-        metadata = {'description': description}
-
-        print(f"Metadata před serializací z def init_message: {metadata}")
-
-        # Odeslani zprávy do RabbitMq
-        self.rabbit_connection.send_message(
-            file_id = file_id,
-            filename = filename,
-            directory=directory,
-            hash_item=hash_item,
-            change_type=change_type,
-            metadata={'description':description},
-            size=size,
-            kontent=kontent
-        )
+    def get_info(self, event):
+        #self.only_filename = os.path.basename(event.src_path)
+        self.my_path = event.src_path
+        print(f"ted zkus overit self.filename z get_info{self.my_path}")
+        print(f"obsah event: {vars(event)}")
 
     # ==========================================================================
-
     def simulate_existing_files(self):
         """Projde seznam souborů a simuluje volání on_created pro každý soubor."""
         for file_path in self.pdf_list:
             event = type('Event', (object,), {'src_path': file_path, 'is_directory': False})()  # Simulace eventu
-            self.on_created(event)  # Volání metody on_created pro simulovaný event
+            self.on_created(event)
+
+    def _handle_event(self, event, action, message):
+        """Pomocná metoda pro zpracování událostí souborů."""
+
+        if not event.is_directory:  # Ignoruje adresáře
+            try:
+                self.init_message(event, action, message)
+
+            except Exception as e:
+                print(f'Chyba při zpracování události: {e}')
+    # ==========================================================================
+    def on_moved(self, event):
+#        if isinstance(event, FileMovedEvent):
+            # src: - puvodni cesta source
+            # dest: - nova uprava
+        #self.get_info(event) # metoda pro nastaveni atribut self.only_filename
+        old_filename = os.path.basename(event.src_path)   # puvodni nazev soubory
+        print("zde je oldfilename:", old_filename)
+
+        path_complete = event.src_path
+        print(f"kompletni cesta v path_complete v on moved{path_complete}")
+
+        new_filename = os.path.basename(event.dest_path) # novy aktualni nazev
+        print("Zde je filename",new_filename)
+
+        print(f"Soubor byl přejmenován z {old_filename} na {new_filename}")
+
+        self.init_message(event, "RENAMED", 'Soubor byl přejmenován')
+
 
     # ==========================================================================
     def on_created(self, event):
-        if not event.is_directory:  # Ignoruje adresáře
-            try:
-                self.init_message(event, 'new', 'Soubor byl vytvořen', event.src_path)
-            except Exception as e:
-                print(f'Chyba při vytváření souboru: {e}')
+        self.get_info(event)
+        self._handle_event(event, "CREATED", 'Soubor byl vytvořen')
 
     # ==========================================================================
     def on_modified(self, event):
-        """Tato metoda je volána při editaci."""
-        if not event.is_directory:  # Ignoruje adresáře
-            try:
-                self.init_message(event, 'edit', 'Soubot byl upraven', event.src_path)
-            except Exception as e:
-                print(f'Chyba při zpracování úprav souboru: {e}')
+        self.get_info(event)
+        self._handle_event(event, "MODIFIED", 'Soubor byl upraven')
 
     # ==========================================================================
     def on_deleted(self, event):
-        """Tato metoda je volána při mazání."""
-        if not event.is_directory:  # Ignoruje adresáře
-            time.sleep(0.1)
-            try:
-                self.init_message(event, 'del', 'Soubor byl smazán', event.src_path)
-            except Exception as e:
-                print(f'Chyba při zpracování mazání souboru: {e}') # vola fci pro odkazovani na instanci tridy
-
-    # ==========================================================================
-    def on_moved(self, event):
-        """Tato metoda je volána při přesunu nebo přejmenování."""
-        if not event.is_directory:      # Ignoruje adresáře
-            try:
-                self.init_message(event, 'del', 'Soubor byl přesunut nebo přejmenován', event.src_path)
-
-                self.init_message(event, 'new', 'Soubor byl přesunut - nová cesta', event.src_path)
-
-            except Exception as e:
-                print(f'Chyba při zpracování přesunutí souboru: {e}')
+        self.get_info(event)
+        time.sleep(0.1)  # Možná zpoždění pro synchronizaci
+        self._handle_event(event, "DELETED", 'Soubor byl smazán')
 
 
 
+   # po kontrole odstrani direcoty_patj
+    def init_message(self,event, change_type, description, new_filename=None):
+        # Celá cesta k souboru (nazev vcetne cesty)
+
+        name_file = event.src_path
+        print(f"Over mit filename v ini_messgae {name_file}")
+        self.name_file = os.path.basename(name_file)  # název souboru
+        print(f"tady over atribut self.name_file{self.name_file}")
+        self.path_file = os.path.dirname(name_file)  # cesta k souboru
+        new_filename = os.path.basename(event.dest_path)
+
+        # Generování ID souboru
+        file_id = str(uuid.uuid4())
+
+        # Výpočet hash souboru, pokud není smazán
+        hash_item = self.comput_file_hash(name_file) if change_type not in ["DELETED", "RENAMED"] else None
+
+        # Zpracování PDF souboru
+        pdf_processor = Pdf_processor()
+        kontent = pdf_processor.proces_pdf(name_file) if change_type in ["CREATED", "MODIFIED"] and os.path.exists(name_file) else None
+
+        # Získání velikosti souboru
+        size = self.get_file_size(name_file)
+
+        # Příprava metadat
+        metadata = {'description': description}
+        if change_type == "RENAMED":
+            metadata['new_filename'] = new_filename  # Uložení starého názvu pro metadata
+            print(f"overeni navratu metadata z old-filename z init_message:{new_filename}")
+
+        # Odeslání zprávy do RabbitMQ
+        self.rabbit_connection.send_message(
+            file_id=file_id,
+            filename=self.name_file,  # Použití názvu souboru
+            directory=self.path_file,  # Použití cesty k souboru
+            hash_item=hash_item,
+            change_type=change_type,
+            metadata=metadata,
+            size=size,
+            kontent=kontent
+        )
 
 if __name__ == '__main__':
 

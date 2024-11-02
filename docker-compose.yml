@@ -112,8 +112,11 @@ services:
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
 
     volumes:
+      - ./shared_models:/usr/src/app/shared_models # rabbit models
+
       - ./pdfs:/usr/src/app/pdfs
       - ./env:/usr/src/app/.env
+
       #- "${DOCKER_DOG_DIRECTORY}:/pdfs" PRIPOJIT V PRODUKCNIM PROSTREDI
       #- /home/duck/web_app_ver1.3/pdfs:/usr/src/pdfs:rw PLATNE NA UNIX V DEVELOP PROSTREDI!
 
