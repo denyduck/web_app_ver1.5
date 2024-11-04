@@ -329,9 +329,10 @@ class Handler(FileSystemEventHandler):
 
     # ==========================================================================
     def simulate_existing_files(self):
+
         """Projde seznam souborů a simuluje volání on_created pro každý soubor."""
-        for file_path in self.pdf_list:
-            event = type('Event', (object,), {'src_path': file_path, 'is_directory': False})()  # Simulace eventu
+        for file in self.pdf_list:
+            event = type('Event', (object,), {'src_path': file, 'is_directory': False})()  # Simulace eventu
             self.on_created(event)
 
     def _handle_event(self, event, action, message):
@@ -362,7 +363,6 @@ class Handler(FileSystemEventHandler):
 
         self.init_message(event, "RENAMED", 'Soubor byl přejmenován')
 
-
     # ==========================================================================
     def on_created(self, event):
         self.get_info(event)
@@ -385,17 +385,28 @@ class Handler(FileSystemEventHandler):
     def init_message(self,event, change_type, description, new_filename=None):
         # Celá cesta k souboru (nazev vcetne cesty)
 
+
         name_file = event.src_path
         print(f"Over mit filename v ini_messgae {name_file}")
+
         self.name_file = os.path.basename(name_file)  # název souboru
         print(f"tady over atribut self.name_file{self.name_file}")
+
         self.path_file = os.path.dirname(name_file)  # cesta k souboru
-        new_filename = os.path.basename(event.dest_path)
+        print(f"Over cestu souboru: {self.path_file}")
+
+        # Kontrola existence dest_path
+        if hasattr(event, 'dest_path') and event.dest_path:
+            new_filename = os.path.basename(event.dest_path)
+        else:
+            print("pouzivam misto dest_path src_path")
+            new_filename = self.name_file
+
 
         # Generování ID souboru
         file_id = str(uuid.uuid4())
 
-        # Výpočet hash souboru, pokud není smazán
+        # Výpočet hash souboru, pokud není smazán nebi prejmenovan protoze jiz hash maji
         hash_item = self.comput_file_hash(name_file) if change_type not in ["DELETED", "RENAMED"] else None
 
         # Zpracování PDF souboru

@@ -38,8 +38,9 @@ class Items(Base):
     filename = Column(String(255), nullable=False)
     directory = Column(String(255), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
+    change_type = Column(Enum(ChangeType), nullable=True)
     last_modified_at = Column(TIMESTAMP, onupdate=func.now())
-    is_active = Column(String(64), default="active")
+    is_active = Column(Boolean, default=True) # activ je True
     message_id = Column(String(255), nullable=False)
     hash_item = Column(String(64), nullable=True)
     size = Column(BigInteger, nullable=True)
