@@ -16,6 +16,8 @@ from sqlalchemy.orm import relationship
 import enum
 import logging
 
+from sqlalchemy.dialects.mysql import LONGTEXT
+
 '''
 func.now()                  # Používá funkci now() databázového serveru k získání aktuálního data a času.
 onupdate=func.now())        # změn hodnotu sloupce pokaždé, když je záznam aktualizován a to časem
@@ -46,7 +48,7 @@ class Items(Base):
     size = Column(BigInteger, nullable=True)
     version = Column(Integer)
     validation_status = Column(String(255))
-    kontent = Column(Text)
+    kontent = Column(LONGTEXT)
 
     changes = relationship('FileChanges', back_populates='item')
 
@@ -86,7 +88,7 @@ class Files(Base):
     last_modified_at = Column(TIMESTAMP, onupdate=func.now())
     size = Column(BigInteger)
     message_id = Column(String(255), nullable=False)
-    kontent = Column(Text)
+    kontent = Column(LONGTEXT)
 
     changes = relationship('FileChanges', back_populates='file')
     file_metadata = relationship('FileMetadata', back_populates='file', uselist=False)
@@ -103,7 +105,7 @@ class FileMetadata(Base):
     title = Column(String(255))
     keyword = Column(Text)
     description = Column(Text)
-    content_text = Column(Text)
+    content_text = Column(LONGTEXT)
 
     file = relationship('Files', back_populates='file_metadata')
 

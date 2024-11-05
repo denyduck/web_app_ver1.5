@@ -1,0 +1,89 @@
+{% import "macros_jinja/makra.jinja2" as makra %}
+
+<!DOCTYPE html>
+<html lang="cs">
+    <head>
+    <!--importy a meta data stranky-->
+    {{ makra.header() }}
+    <!--pojmenovani stranky-->
+    {{ makra.title("basic_inside")}}
+    </head>
+
+    <body data-bs-theme="dark">
+
+
+    <!--navigacni listy-->
+    {{ makra.navbar(False) }}
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-10 col-md-12">
+                <div class="text-center">
+                    <!-- Titulek a podtitulek -->
+                    <h1>Bezpečnostní listy pro zaměstnance</h1>
+                    <p class="text-muted font-italic">Zákon č. 262/2006 Sb. - Zákoník práce</p>
+                </div>
+
+                <!-- Upozornění -->
+                <div class="alert alert-info mt-4" role="alert">
+                    <h4>Co jsou bezpečnostní listy?</h4>
+                    <p>Bezpečnostní listy obsahují důležité informace o chemických látkách a směsích, včetně jejich vlastností, nebezpečí a pokynů pro bezpečné zacházení.</p>
+                </div>
+
+                <!-- Povinnosti zaměstnavatele -->
+                <!-- Povinnosti zaměstnavatele -->
+                <section class="mt-5">
+                    <h2>Povinnosti zaměstnavatele</h2>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2">
+                            Zaměstnavatel musí zajistit, aby byly bezpečnostní listy k dispozici všem zaměstnancům, kteří s těmito látkami pracují.
+                            <p class="mt-1">To zahrnuje pracovníky v laboratořích, výrobních halách a dalších oblastech. Dostupnost těchto dokumentů je zásadní pro ochranu zdraví zaměstnanců a pro dodržení právních předpisů.</p>
+                        </li>
+                        <li class="mb-2">
+                            Bezpečnostní listy by měly být umístěny na přístupném místě, například v pracovní oblasti, v dobře označených složkách, nebo na intranetu firmy, aby si je zaměstnanci mohli snadno najít.
+                            <p class="mt-1">Tímto způsobem mají zaměstnanci rychlý přístup k informacím o nebezpečných látkách, které používají, což je klíčové pro prevenci úrazů a nehod.</p>
+                        </li>
+                        <li class="mb-2">
+                            Školení zaměstnanců ohledně obsahu bezpečnostních listů a správného zacházení s chemickými látkami je nezbytné.
+                            <p class="mt-1">Zaměstnanci by měli mít úvodní školení a pravidelné osvěžovací kurzy, aby byli informováni o nejnovějších bezpečnostních protokolech a správných postupech. Tím se minimalizuje riziko nesprávného zacházení s chemikáliemi.</p>
+                        </li>
+                        <li class="mb-2">
+                            Pravidelná kontrola a aktualizace bezpečnostních listů je klíčová pro zajištění jejich aktuálnosti.
+                            <p class="mt-1">Zaměstnavatelé by měli sledovat změny od dodavatelů a reagovat na nové informace. To zahrnuje revizi a aktualizaci školení podle nových verzí bezpečnostních listů, aby se zajistila maximální ochrana zaměstnanců.</p>
+                        </li>
+                        <li class="mb-2">
+                            Záznamy o dostupnosti bezpečnostních listů a o školeních zaměstnanců by měly být pečlivě uchovávány.
+                            <p class="mt-1">To zahrnuje dokumentaci datumu a obsahu školení a seznamu zúčastněných zaměstnanců. Tyto záznamy mohou být důležité při auditech a inspekcích, aby se prokázalo, že firma dodržuje zákonné požadavky.</p>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Jak získat bezpečnostní listy -->
+                <section class="mt-5">
+                    <h2>Jak získat bezpečnostní listy</h2>
+                    <p>Bezpečnostní listy jsou k dispozici na následujících místech:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">U vedoucího pracovníka na oddělení výroby</li>
+                        <li class="list-group-item">Na webové adrese:
+                        <a href="{{ url_for('routes.admin.home')}}" class="text-decoration-none">bl.fontea.cz</a>
+                    </ul>
+                </section>
+
+                <!-- Další informace -->
+                <section class="mt-5">
+                    <h2 class="text-secondary">Další informace</h2>
+                    <p>Aplikace je plně webová, což znamená, že uživatelé mohou mít přístup k bezpečnostním listům odkudkoliv a kdykoliv, což zvyšuje efektivitu a dostupnost informací.
+                    </p>
+                    <strong>APLIKACE SE NACHÁZÍ V TESTOVACÍM REŽIMU. Tato verze zatím nedovoluje vzdálené přístupy mimo siť "fontea" </strong>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!--bocni{{ makra.sidebar() }} vertialni menu-->
+
+
+    <!--paticka-->
+    {{ makra.footer_dve() }}
+
+    </body>
+</html>

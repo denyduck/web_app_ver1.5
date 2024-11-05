@@ -36,7 +36,7 @@ services:
     environment:
       FLASK_APP: run.py  # Určuje, který soubor Flask aplikace bude spuštěn
       FLASK_RUN_HOST: 0.0.0.0  # Nastavuje Flask aplikaci tak, aby byla dostupná zvenčí kontejneru
-
+      FLASK_ENV: development  # pro vyvojove prostredi, flask udrzuje hlidani sounoru a predava primo vysledky bez potreby nove vytvareni isa a kontejneru
       DATABASE_URL: ${DATABASE_URL}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
@@ -59,7 +59,7 @@ services:
 
     depends_on:
       - flask  # Gunicorn závisí na službě `flask`, která musí být spuštěna dříve
-    command: ["gunicorn", "--bind", "0.0.0.0:8000", "run:flask_app"]
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "--reload", "run:flask_app"]
     networks:
       - my_network
     # Příkaz, který spustí Gunicorn server dostupny na vsech adresach s dostupnym portem 8000

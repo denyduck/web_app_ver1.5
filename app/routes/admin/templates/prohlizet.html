@@ -1,22 +1,32 @@
 {% import "macros_jinja/makra.jinja2" as makra %}
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="cs">
-  <head>
+    <head>
     <!--importy a meta data stranky-->
     {{ makra.header() }}
     <!--pojmenovani stranky-->
     {{ makra.title("basic_inside")}}
-  </head>
+    </head>
 
-  <body data-bs-theme="dark">
+    <body data-bs-theme="dark">
+
+
     <!--navigacni listy-->
-    {{ makra.navbar(True) }}
+    {{ makra.navbar(False) }}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 d-flex justify-content-center align-items-center">
+                <h1>Na stránce se intenzivně pracuje.</h1>
+            </div>
+        </div>
+    </div>
 
-    <!--bocni vertialni menu-->
-    {{ makra.sidebar() }}
-    
+    <!--bocni{{ makra.sidebar() }} vertialni menu-->
+
+
     <!--paticka-->
-    {{  makra.footer() }}
-  </body>
+    {{ makra.footer_dve() }}
+
+    </body>
 </html>

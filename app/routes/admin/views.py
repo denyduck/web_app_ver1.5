@@ -99,6 +99,10 @@ def prohlizet():
 def intra():
     return render_template('intra.html')
 
+@admin_bp.route('/o_projektu')
+def o_projektu():
+    return render_template('o_projektu.html')
+
 #===================================================================================#
 # 2.3 Testovani - pri nepouzvani ZAKOMENTOVAT
 @admin_bp.route('/base_inside') # za prefixem BP vratit primo stranku /dashboard..html
