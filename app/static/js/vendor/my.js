@@ -1,208 +1,304 @@
-let currentFocus = -1; // Pro sledování aktuální pozice ve výběru
+/*
+OBSAH
+    1. Konstanty a globální proměnné
+        1.1 CONSTANTY
+        - Odkazuje na HTML elementy, které budou použity pro vyhledávání a zobrazení návrhů.
+        - Inicializace instancí Bootstrap modalů pro zobrazení výsledků a PDF souborů.
+        1.2 PROMĚNNÉ
+        - Drží aktuální indexy zaměřených položek v seznamech, což je použito pro klávesovou navigaci mezi návrhy.
 
+    2. Funkce spojené s inicializací stránky a prvků
+        - Kontrola dostupnosti prvků na stránce.
+        - Inicializace potřebných funkcí po načtení stránky, např. umístění kurzoru do vyhledávacího pole.
+        - Připojení posluchačů událostí pro interakci uživatele.
 
-// Funkce pro umístění kurzoru do vyhledávacího pole
-function focusOnSearchField() {
-  document.getElementById('searchField').focus();
+    3. Seskupení funkcí pro manipulaci s DOM
+        - Funkce pro vyčištění návrhů, zobrazení chybových zpráv nebo interakci s uživatelským vstupem.
+
+    4. Komunikace se serverem
+        - Volání endpointu "/autocomplete" pro zpracování vyhledávacího dotazu a získání návrhů.
+
+    5. Zobrazení návrhu výsledků uživateli
+        - Vyprázdnění seznamu návrhů před přidáním nových výsledků.
+        - Vytváření položek návrhu a jejich přidání do seznamu s událostí pro otevření PDF.
+
+    6. Klávesová navigace pro pohyb v modalech
+        - Funkce pro interaktivní pohyb v seznamu návrhů a seznamu výsledků pomocí kláves.
+        - Zajištění zvýraznění aktivní položky a umožnění rychlého výběru pomocí kláves.
+
+==========================================================================================
+==========================================================================================
+*/
+// 1. Konstanty a globalni promene
+
+// 1.1 CONSTANTY
+// prirazeni prvku z DOM
+const searchField = document.getElementById('searchField');
+const suggestions = document.getElementById('suggestions');
+const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
+const pdfModal = new bootstrap.Modal(document.getElementById('pdfModal'));
+const pdfIframe = document.getElementById('pdfIframe');
+const searchButton = document.getElementById('searchButton');
+
+// Globální stav pro focus
+const focusState = {
+    suggestionFocus: -1,
+    resultListFocus: -1,
+};
+
+//==========================================================================================
+// 2.1 Funkce pro kontrolu dostupnosti prvku DOM
+function validateDOMElements() {
+    if (!searchField) console.warn("Element #searchField nebyl nalezen.");
+    if (!suggestions) console.warn("Element #suggestions nebyl nalezen.");
+    if (!resultsModal) console.warn("Modal #resultsModal nebyl inicializován.");
+    if (!pdfModal) console.warn("Modal #pdfModal nebyl inicializován.");
+    if (!pdfIframe) console.warn("Element #pdfIframe nebyl nalezen.");
 }
 
-// Načítání návrhů na základě vstupu uživatele
-document.getElementById('searchField').addEventListener('input', function() {
-  let query = this.value;
+// Inicializace stránky
+function initPage() {
+    validateDOMElements();
+    attachEventListeners();
 
-  // Pokud je dotaz prázdný, vyčisti návrhy
-  if (!query) {
-    document.getElementById('suggestions').innerHTML = '';
-    document.getElementById('suggestions').style.display = 'none';
-    return;
-  }
+    searchField.focus(); // Zaměření na vyhledávací pole
+}
 
-  // AJAX volání pro získání návrhů
-  fetch('/autocomplete?query=' + encodeURIComponent(query))
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log(data);
-      const suggestions = document.getElementById('suggestions');
-      suggestions.innerHTML = ''; // Vyčisti předchozí návrhy
-      currentFocus = -1; // Resetuj aktuální pozici při novém hledání
+window.addEventListener('load', initPage);
 
-      // Zpracování návrhů
-      if (Array.isArray(data) && data.length > 0) {
-        data.forEach((item) => {
-          const suggestionItem = document.createElement('a');
-          suggestionItem.className = 'list-group-item list-group-item-action';
-          suggestionItem.textContent = item.filename; // Název souboru
+//==========================================================================================
+// Pomocné funkce a funkce pro přetěžování
 
-          // Přidání události pro kliknutí na návrh
-          suggestionItem.addEventListener('click', function() {
-            window.open(item.directory + '/' + item.filename, '_blank'); // Otevře PDF v novém okně
-            suggestions.innerHTML = ''; // Vyčisti návrhy
-            document.getElementById('searchField').value = ''; // Vyprázdni vyhledávací pole
-            suggestions.style.display = 'none'; // Skrýt návrhy po výběru
-            focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
-          });
+// Univerzální funkce pro komunikaci se serverem
+function fetchData(endpoint, query) {
+    return fetch(`${endpoint}?query=${encodeURIComponent(query)}`)
+        .then(response => response.ok ? response.json() : Promise.reject('Chyba: ' + response.statusText));
+}
 
-          suggestions.appendChild(suggestionItem);
-        });
-        suggestions.style.display = 'block'; // Zobraz návrhy
-      } else {
-        suggestions.style.display = 'none'; // Skryj, pokud nejsou žádné návrhy
-      }
-    })
-    .catch(error => {
-      console.error('Chyba při načítání návrhů:', error);
-      document.getElementById('suggestions').innerHTML = 'Chyba při načítání návrhů.';
-      document.getElementById('suggestions').style.display = 'block';
-    });
-});
+// Univerzální funkce pro fokusování aktuální položky
+function setActive(items, focusIndex) {
+    Array.from(items).forEach(item => item.classList.remove('active'));
+    if (items[focusIndex]) {
+        items[focusIndex].classList.add('active');
+        items[focusIndex].scrollIntoView({ block: 'nearest' });
+    }
+}
 
-// Navigace v návrzích pomocí klávesnice
-document.getElementById('searchField').addEventListener('keydown', function(e) {
-  const suggestions = document.getElementById('suggestions');
-  const items = suggestions.getElementsByTagName('a');
+// Vyčistí kontejner
+function clearSuggestions() {
+    console.log("cisteni")
+    suggestions.innerHTML = ' ';
+    suggestions.style.display = 'none';
+    focusState.suggestionFocus = -1; // Reset fokusového stavu
+}
 
-  if (e.key === 'ArrowDown') {
-    // Šipka dolů
-    currentFocus++;
-    if (currentFocus >= items.length) currentFocus = 0;
-    setActive(items);
-  } else if (e.key === 'ArrowUp') {
-    // Šipka nahoru
-    currentFocus--;
-    if (currentFocus < 0) currentFocus = items.length - 1;
-    setActive(items);
-  } else if (e.key === 'Enter') {
-    // Potvrzení klávesou Enter
-    e.preventDefault();
-    focusOnSearchField()
+// Zobrazí chybovou zprávu
+function showErrorInSuggestions(message) {
+    suggestions.innerHTML = `<li class="list-group-item text-danger">${message}</li>`;
+    suggestions.style.display = 'block';
+}
 
-
-    // Pokud je v našeptávači vybrána nějaká položka, vyber ji
-    if (currentFocus > -1 && items[currentFocus]) {
-      items[currentFocus].click();
+// 4. Zpracování návrhů výsledků z /autocomplete
+function handleSearchInput() {
+    const query = searchField.value.trim();
+    if (query.length > 0) {
+        const endpoint = '/autocomplete'; // Endpoint pro autocomplete
+        fetchData(endpoint, query)
+            .then(data => populateSuggestions(data))
+            .catch(() => showErrorInSuggestions('Došlo k chybě při načítání návrhů.'));
     } else {
-      // Pokud není vybrán žádný návrh, spustí se vyhledávání stejně jako při kliknutí na tlačítko "Hledat"
-      searchFiles();
-      focusOnSearchField()
+        clearSuggestions();
+    }
+}
+// ==========================================================
+// ============ PRÁCE S NÁSEPTÁVÁČEM ========================
+
+// Vysledky pro náseptávač
+function populateSuggestions(data) {
+    clearSuggestions();                                 //vycisti prechozi navrhy
+    if (Array.isArray(data) && data.length > 0) {   //zkontroluje zda jsou data a obsahuji nejake polozky
+        data.forEach(item => {                      //pokud jsou data pokracuj
+            const suggestionItem = document.createElement('a'); // pro kazdy prvek v poli data se vytvori novy element <a>, ktery reprezentuje navrh
+            suggestionItem.className = 'list-group-item list-group-item-action';    //Ziska tricdu pro ostlovani
+            suggestionItem.textContent = item.filename;     //nastavi textovy obsah ktery se ma zobrazit
+            suggestionItem.dataset.directory = item.directory; // ulozi se do datoveho atributu dataset.directory
+            suggestions.appendChild(suggestionItem);
+
+            //pridani posluchace kliknuti pro otevreni PDF Modalu
+            suggestionItem.addEventListener('click', () => handleSuggestionsClick(item));  //kazd ynavrh dostane posluchace kliknuti, kdyz se klikne na navrh zavolase fce handle...
+
+            suggestions.appendChild(suggestionItem);
+        });
+        suggestions.style.display = 'block';  //po pridani vsech navrhu se nastavi styl zobrazi pro kontejner navrhu
+    } else {
+        showErrorInSuggestions("Nebyly nalezeny žádné návrhy.");
+    }
+}
+
+// funkce pro zoracovani kliknuti na polozku
+function handleSuggestionsClick(item) {
+    console.log(item); // Zobrazí objekt item v konzoli, abyste viděli, co obsahuje.
+
+    //otevri pdfmodal
+    pdfModal.show();
+    // po zobrazeni modalu napln
+    pdfModal._element.addEventListener('shown.bs.modal', function() {
+        pdfIframe.src = `${item.directory}/${item.filename}`;
+    });
+    // vycisti vse
+    clearSuggestions();
+}
+
+
+// 6. Klávesová navigace ve výsledcích pro náseptávač
+function handleKeyboardNavigation(e) {
+    const items = suggestions.getElementsByTagName('a'); // Získá seznam návrhů
+    if (items.length === 0) return; // Pokud návrhy nejsou, ukončí funkci
+
+    if (e.key === 'ArrowDown') {
+        focusState.suggestionFocus = (focusState.suggestionFocus + 1) % items.length; // Posun o 1 dolů
+        setActive(items, focusState.suggestionFocus); // Zvýraznění aktivní položky
+    } else if (e.key === 'ArrowUp') {
+        focusState.suggestionFocus = (focusState.suggestionFocus - 1 + items.length) % items.length; // Posun o 1 nahoru
+        setActive(items, focusState.suggestionFocus); // Zvýraznění aktivní položky
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+
+        // Pokud je aktivní položka
+        if (focusState.suggestionFocus >= 0 && items[focusState.suggestionFocus]) {
+            const selectedItem = items[focusState.suggestionFocus];
+            pdfModal.show();
+            pdfIframe.src = `${selectedItem.dataset.directory}/${selectedItem.textContent}`; // Naplní modal
+            clearSuggestions();
+            return;
+        }
+
+        // Pokud není aktivní položka
+        const query = searchField.value.trim();
+        if (query.length > 0) {
+            showResultsModal(query); // Zobrazí modal s výsledky
+            clearSuggestions();
+        }
+    } else if (e.key === 'Escape') {
+        clearSuggestions(); // Vymaže návrhy
+    }
+}
+
+// ==========================================================
+// ============ PRÁCE S PDFLIST MODÁLEM =======================
+
+// 7. Zpracování výsledků hledání ze serveru
+function showResultsModal(query) {
+    if (query.length > 0) {
+        const endpoint = '/autocomplete';
+        fetchData(endpoint, query)
+            .then(data => populateResultsList(data))
+            .catch(() => console.error('Chyba při načítání výsledků.'));
+        resultsModal.show();
+    } else {
+        console.warn('Vyhledávací pole je prázdné.');
+    }
+}
+
+// Naplánování seznamu v PDF list
+function populateResultsList(data) {
+    const resultsList = document.getElementById('resultsList');
+    resultsList.innerHTML = ''; // Vyčistí předchozí výsledky
+    if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item list-group-item-action';
+            listItem.textContent = item.title || item.filename;
+
+            listItem.addEventListener('click', () => handleResultClick(item));
+            resultsList.appendChild(listItem);
+        });
+    } else {
+        const noResultsItem = document.createElement('li');
+        noResultsItem.className = 'list-group-item text-muted';
+        noResultsItem.textContent = 'Žádné výsledky nebyly nalezeny.';
+        resultsList.appendChild(noResultsItem);
+    }
+    resultsModal.show();
+}
+
+// Funkce pro zpracování kliknutí na položku v seznamu výsledků
+function handleResultClick(item) {
+    console.log(item)
+    // Zavření modalu s výsledky
+    resultsModal.hide();
+
+    // Otevření pdf modalu a naplnění iframe s odpovídajícím souborem
+    pdfModal.show();
+
+    pdfModal._element.addEventListener('shown.bs.modal', function() {
+        pdfIframe.src = `${item.directory}/${item.filename}`;
+    });
+    clearSuggestions();
+}
+
+
+// 8. Klávesová navigace v seznamu PDF
+function handlePdfListNavigation(e) {
+    const listItems = document.querySelectorAll('#resultsList li'); // Načtení položek seznamu
+    if (listItems.length === 0) return; // Pokud seznam nemá položky, ukonči funkci
+
+    if (e.key === 'ArrowDown') {
+        focusState.resultListFocus = (focusState.resultListFocus + 1) % listItems.length;
+        setActive(listItems, focusState.resultListFocus); // Nastaví aktivní položku
+    } else if (e.key === 'ArrowUp') {
+        focusState.resultListFocus = (focusState.resultListFocus - 1 + listItems.length) % listItems.length;
+        setActive(listItems, focusState.resultListFocus); // Nastaví aktivní položku
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (focusState.resultListFocus >= 0 && listItems[focusState.resultListFocus]) {
+            const selectedItem = listItems[focusState.resultListFocus]; // Získá aktivní položku
+
+            // Simulace kliknutí na položku (otevře PDF modal automaticky)
+            selectedItem.click();
+
+            // Zavře modal s výsledky
+            clearSuggestions();
+            closeResultsModal();
+        }
+    } else if (e.key === 'Escape') {
+        clearSuggestions();
+        closeResultsModal(); // Zavře modal při stisku Escape
 
     }
-  } else if (e.key === 'Escape') {
-    // Zavření návrhů klávesou Escape
-    suggestions.style.display = 'none';
-    focusOnSearchField()
-  }
-});
-
-// Přidání události, která skryje našeptávač při kliknutí mimo něj
-document.addEventListener('click', function(event) {
-  const searchField = document.getElementById('searchField');
-  const suggestions = document.getElementById('suggestions');
-
-  // Zkontroluj, zda bylo kliknuto mimo vyhledávací pole nebo našeptávač
-  if (!searchField.contains(event.target) && !suggestions.contains(event.target)) {
-    suggestions.style.display = 'none'; // Stejně jako při stisku klávesy Escape
-    focusOnSearchField()
-  }
-});
-
-// Nastaví aktivní prvek v seznamu návrhů
-function setActive(items) {
-  // Odstraní aktivní třídu ze všech položek
-  for (let i = 0; i < items.length; i++) {
-    items[i].classList.remove('active');
-  }
-  // Přidá aktivní třídu k aktuální položce
-  if (items[currentFocus]) {
-    items[currentFocus].classList.add('active');
-    items[currentFocus].scrollIntoView({ block: "nearest" });
-  }
 }
 
-// Funkce pro spuštění vyhledávání (použitá jak pro tlačítko, tak pro klávesu Enter)
-function searchFiles() {
-  let query = document.getElementById('searchField').value;
 
-  // Pokud je dotaz prázdný, vyčisti návrhy a modální okno
-  if (!query) {
-    document.getElementById('resultsList').innerHTML = '<li class="list-group-item">Zadejte hledaný název.</li>';
-    const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
-    resultsModal.show();
-    focusOnSearchField(); // Umístí kurzor do vyhledávacího pole
-    return;
-  }
+// Zavření modalu s výsledky
+function closeResultsModal() {
+    resultsModal.hide(); // Skryje modal s výsledky
+    searchField.focus(); // Zaměření zpět na vyhledávací pole
+    clearSuggestions();
+}
 
-  // AJAX volání pro získání výsledků do modalu
-  fetch('/autocomplete?query=' + encodeURIComponent(query))
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok ' + response.statusText);
-      }
-      return response.json();
-    })
-    .then(data => {
-      const resultsList = document.getElementById('resultsList');
-      resultsList.innerHTML = ''; // Vyčisti předchozí výsledky
+// Zavření PDF modalu
+document.getElementById('pdfModal').addEventListener('hidden.bs.modal', () => {
+    searchField.focus(); // Zaměření zpět na vyhledávací pole po zavření PDF modalu
+    clearSuggestions();
+});
 
-      if (Array.isArray(data) && data.length > 0) {
-        // Pro každý nalezený soubor přidáme do seznamu novou položku
-        data.forEach((item) => {
-          const resultItem = document.createElement('li');
-          resultItem.className = 'list-group-item';
-          // Odkaz na PDF soubor
-          const link = document.createElement('a');
-          link.href = item.directory + '/' + item.filename;
-          link.target = '_blank'; // Otevře PDF v novém okně
-          link.textContent = item.filename; // Zobrazí název souboru
 
-          resultItem.appendChild(link);
-          resultsList.appendChild(resultItem);
-        });
-      } else {
-        // Pokud nejsou nalezeny žádné výsledky
-        resultsList.innerHTML = '<li class="list-group-item">Žádné výsledky nenalezeny.</li>';
-      }
+// 9. Připojení posluchačů událostí
+function attachEventListeners() {
+    searchField.addEventListener('input', handleSearchInput);
+    searchField.addEventListener('keydown', handleKeyboardNavigation);
+    searchButton.addEventListener('click', () => {
+        const query = searchField.value.trim();
+        if (query.length > 0) showResultsModal(query);
+    });
 
-      // Zobrazení modálního okna s výsledky
-      const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
-      resultsModal.show();
+    document.addEventListener('keydown', handlePdfListNavigation);
 
-      // Vyprázdni vyhledávací pole po zobrazení výsledků
-      document.getElementById('searchField').value = '';
-      focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
-    })
-    .catch(error => {
-      console.error('Chyba při vyhledávání:', error);
-      document.getElementById('resultsList').innerHTML = '<li class="list-group-item">Došlo k chybě při vyhledávání.</li>';
-      const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
-      resultsModal.show();
-
-      // Vyprázdni vyhledávací pole i v případě chyby
-      document.getElementById('searchField').value = '';
-      focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
+    // Refocus search field when any modal is hidden
+    document.getElementById('resultsModal').addEventListener('hidden.bs.modal', () => {
+        searchField.focus();
+    });
+    document.getElementById('pdfModal').addEventListener('hidden.bs.modal', () => {
+        searchField.focus();
     });
 }
-
-// Vyhledávání po kliknutí na tlačítko "Hledat"
-document.getElementById('searchButton').addEventListener('click', function() {
-  searchFiles();
-  focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
-});
-
-// Umístění kurzoru do vyhledávacího pole při načtení stránky
-window.addEventListener('load', function() {
-  // Vyprázdnění vyhledávacího pole a odstranění posledního hledání
-  localStorage.removeItem('lastSearch'); // Odstranění posledního hledání
-  focusOnSearchField(); // Umístí kurzor do vyhledávacího pole
-});
-
-// Přidání události pro zavření modálu
-document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
-  document.getElementById('suggestions').innerHTML = ''; // Vyprázdnění návrhů
-  document.getElementById('suggestions').style.display = 'none'; // Skrytí návrhů po zavření
-  focusOnSearchField(); // Umístí kurzor zpět do vyhledávacího pole
-});

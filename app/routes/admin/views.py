@@ -37,7 +37,24 @@ from app.routes.admin import admin_bp
 import re
 
 
+
+
 # 2. REGISTRACE
+# 2.1 Templates - routes
+#   2.1.1 def home
+#       - vrat z request hodnotu paramatetru "query" a metodou 'strip' odstran mezery, cele to uloz do "query"
+#       - vytvor prazdny seznam pro jeho naplneni
+#       - pokud je "query" platne, do 'results' uloz vsechny polozky z tabulky Files, kde metoda "like" odpovida retezci shode v 'kontent' a 'filename'
+#       - cyklus pro kazde 'r' v 'results pridej polozku po polozce do seznamu 'results_list'
+#       - renderuj sablonu s vysledkama, tak aby sli pouzit v html
+#   2.1.2 def autocomplete
+#       - fce, pro poskytnutí dynamických návrhu uživateli behem psani do vyhledavaciho pole, slouzi jako NASEPTAVAC
+#       -
+#   2.1.3 def prohlizet
+#   2.1.4 def intra
+#   2.1.5 def o_projektu
+
+##
 
 @admin_bp.route('/')
 def home():
@@ -46,9 +63,7 @@ def home():
 
     if query:  # Pokud query není prázdné, provede dotaz
         # Hlavní vyhledávání v obsahu a názvech souborů
-        results = session.query(Files).filter(
-            Files.kontent.like(f'%{query}%') | Files.filename.like(f'%{query}%')
-        ).all()
+        results = session.query(Files).filter(Files.kontent.like(f'%{query}%') | Files.filename.like(f'%{query}%')).all()
 
         if results:  # Pokud jsou nalezeny výsledky, zpracuje je
             for r in results:
@@ -61,11 +76,9 @@ def home():
     # Renderuje šablonu a předává výsledky a query
     return render_template('home.html', results=results_list, query=query)
 
-    # Pokud není dotaz, vrátíme prázdný seznam
-
+#=========================================================================================================
 @admin_bp.route('/autocomplete')
 def autocomplete():
-
 
     query = request.args.get('query', '').strip().lower()
     results = []
@@ -91,6 +104,7 @@ def autocomplete():
     ])
 
 
+#=========================================================================================================
 @admin_bp.route('/prohlizet')
 def prohlizet():
     return render_template('prohlizet.html')

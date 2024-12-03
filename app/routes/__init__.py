@@ -1,3 +1,4 @@
+
 from flask import Blueprint
 
 # vytvoření hlavniho BP pro registrace stranek html ve views

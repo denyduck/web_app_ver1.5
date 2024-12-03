@@ -385,7 +385,6 @@ class Handler(FileSystemEventHandler):
     def init_message(self,event, change_type, description, new_filename=None):
         # Celá cesta k souboru (nazev vcetne cesty)
 
-
         name_file = event.src_path
         print(f"Over mit filename v ini_messgae {name_file}")
 

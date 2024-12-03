@@ -255,7 +255,6 @@ font-size: 1.5rem; /* Velikost ikony lupy */
 
 
 
-
 .card {
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Standardní */
     -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease; /* Safari */
