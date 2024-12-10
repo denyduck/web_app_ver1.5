@@ -3,30 +3,65 @@
 <!DOCTYPE html>
 <html lang="cs">
     <head>
-    <!--importy a meta data stranky-->
-    {{ makra.header() }}
-    <!--pojmenovani stranky-->
-    {{ makra.title("basic_inside")}}
+        <!-- Importy a meta data stránky -->
+        {{ makra.header() }}
+        <!-- Pojmenování stránky -->
+        {{ makra.title("Seznam bezpečnostních listů") }}
+
+        <!-- Odkaz na Bootstrap, pokud není zahrnut přes makra -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
     </head>
 
     <body data-bs-theme="dark">
+        <!-- Navigační lišta -->
+        {{ makra.navbar(False) }}
 
-
-    <!--navigacni listy-->
-    {{ makra.navbar(False) }}
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-6 d-flex justify-content-center align-items-center">
-                <h1>Na stránce se intenzivně pracuje.</h1>
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 text-center ">
+                    <h1>Seznam bezpečnostních listů</h1>
+                    <div id="accordionContainer" class="accordion pt-5 "></div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!--bocni{{ makra.sidebar() }} vertialni menu-->
+        <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel"  aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-xl">
+
+                <div class="modal-conten">
+                    <div class="modela-header">
+                        <h5 class="modal-title" id="pdfModalLabel">Náhled PDF</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                    </div>
+                    <div class="modal-body">
+                        <iframe id="pdfIframe" style="width: 100%; height: 1000px;" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
-    <!--paticka-->
-    {{ makra.footer_dve() }}
+
+        <!-- Boční vertikální menu (volitelné) -->
+        <!-- {{ makra.sidebar() }} -->
+
+        <!-- Paticka -->
+        {{ makra.footer_dve() }}
+
+
+
+
+
 
     </body>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Odkaz na vlastní JavaScript soubor -->
+    <script src="{{ url_for('static', filename='js/vendor/prohlizet.js') }}"></script>
+
+
 </html>

@@ -303,3 +303,72 @@ font-size: 1.5rem; /* Velikost ikony lupy */
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+
+
+
+/* Zrušení rámečků pro celý accordion */
+.accordion-item {
+    border: none !important; /* Přidání !important pro silnější přepsání */
+}
+
+/* Zrušení rámečku při hover */
+.accordion-item:hover {
+    background-color: none !important;
+    border: none !important; /* Zrušení borderu při hover */
+    box-shadow: none !important; /* Zrušení box-shadow při hover */
+}
+
+/* Stylování hlavičky accordionu */
+.accordion-header {
+    background-color: #40916c;
+    opacity: 0.8;
+    border: none !important; /* Přidání !important pro přepsání */
+}
+
+/* Zrušení borderu při hover na hlavičku */
+.accordion-header:hover {
+    border: none !important; /* Zrušení borderu při hover */
+    box-shadow: none !important; /* Zrušení shadow efektu při hover */
+}
+
+/* Tlačítko */
+.accordion-button {
+    background-color: #2d6a4f !important;
+    color: white !important;
+    border-radius: 0px;
+    border: none !important; /* Zrušení rámečku na tlačítku */
+    outline: none !important; /* Odstranění focus obrysu */
+    box-shadow: none !important; /* Odstranění box-shadow */
+}
+
+/* Zrušení rámečku při hover na tlačítku */
+.accordion-button:hover {
+    background-color: #1b4332 !important; /* Změna barvy při hover */
+    border: none !important; /* Zrušení rámečku při hover */
+    outline: none !important; /* Odstranění focus rámečku při hover */
+    box-shadow: none !important; /* Zrušení stínu při hover */
+}
+
+/* Zrušení rámečku při focusu na tlačítku */
+.accordion-button:focus {
+    outline: none !important; /* Odstranění focus rámečku */
+    box-shadow: none !important; /* Zrušení stínu při focus */
+}
+
+/* Změna barvy šipky (collapse icon) na červenou */
+.accordion-button::after {
+    color: red !important; /* Červená barva pro šipku */
+    font-size: 1.5em; /* Možná je potřeba upravit velikost šipky */
+}
+
+/* Změna barvy šipky na tmavší červenou při hover */
+.accordion-button:hover::after {
+    color: darkred !important; /* Tmavší červená při hover */
+}
+
+/* Změna barvy šipky pro otevřený accordion (rozevřený panel) */
+.accordion-button:not(.collapsed)::after {
+    color: red !important; /* Zůstane červená i pro otevřený panel */
+}

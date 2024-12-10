@@ -56,6 +56,9 @@ import re
 
 ##
 
+#=========================================================================================================
+#=========================================================================================================
+# Route reneder stranky
 @admin_bp.route('/')
 def home():
     query = request.args.get('query', '').strip()  # Odstraní nadbytečné mezery z query
@@ -75,8 +78,8 @@ def home():
 
     # Renderuje šablonu a předává výsledky a query
     return render_template('home.html', results=results_list, query=query)
-
 #=========================================================================================================
+# Route zodpovedny za AJAX na render route def home
 @admin_bp.route('/autocomplete')
 def autocomplete():
 
@@ -103,11 +106,44 @@ def autocomplete():
         } for file in results
     ])
 
-
+#=========================================================================================================
 #=========================================================================================================
 @admin_bp.route('/prohlizet')
 def prohlizet():
+
     return render_template('prohlizet.html')
+
+
+#=========================================================================================================
+# Route pro ziskavani JSON dat
+
+@admin_bp.route('/prohlizet/data')
+
+def prohlizet_data():
+    session = Session()  # Inicializace session
+    item_files = []
+    try:
+        # Načtení všech souborů
+        item_files = session.query(Files).all()
+    except Exception as e:
+        # Pokud dojde k chybě, vrátí se chybová odpověď
+        return jsonify({'error': str(e)}), 500
+    finally:
+        session.close()  # Zavření session, aby se uvolnily prostředky
+
+    # Vrácení JSON dat
+    return jsonify([
+        {
+            'filename': file.filename,
+            'kontent': file.kontent[:400] if file.kontent else '',  # Ořízne kontent na 400 znaků
+            'directory': file.directory[file.directory.find('/pdfs/'):] if file.directory and file.directory.find(
+                '/pdfs/') != -1 else '/pdfs/'
+        } for file in item_files
+    ])
+
+
+#=========================================================================================================
+#=========================================================================================================
 
 @admin_bp.route('/intra')
 def intra():
