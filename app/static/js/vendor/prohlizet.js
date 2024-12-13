@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (files.length === 0) {
                     accordionContainer.innerHTML = `
                         <div class="alert alert-info text-center">
-                            Žádné soubory nebyly nalezeny.
+                            Dosud nebyly nalezeny žádné soubory.
                         </div>`;
                     return;
                 }
@@ -53,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let accordionHTML = '';
                 files.forEach((file, index) => {
                     const isFirst = index === 0; // První položka otevřená
-                    const pdfPath = `/pdfs/${file.filename}`; // Dynamická cesta k PDF
+                    const pdfPath = `/pdfs/${file.directory}/${file.filename}`; // Dynamická cesta k PDF
+
                     accordionHTML += `
                         <div class="accordion accordion-flush">
                             <div class="accordion-item">
@@ -80,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                         <div class="d-flex justify-content-between">
                                             <button class="btn btn-sm btn-primary"
-                                                    onclick="openPdfModal('${file.filename}')">
+                                                    onclick="openPdfModal('${pdfPath}', '${file.filename}')">
                                                 Náhled
                                             </button>
                                         </div>
@@ -104,15 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Funkce pro otevření modálního okna s náhledem PDF
-function openPdfModal(filename) {
+function openPdfModal(pdfPath, filename) {
     // Nastav src pro iframe na cestu k PDF
     const pdfIframe = document.getElementById('pdfIframe');
-    pdfIframe.src = `/pdfs/${filename}`; // Dynamická cesta k souboru
+    if (pdfIframe) {
+        pdfIframe.src = pdfPath;
+    }
 
     // Nastav titulek modálního okna na název souboru
     const pdfModalLabel = document.getElementById('pdfModalLabel');
     if (pdfModalLabel) {
-        pdfModalLabel.textContent = filename; // Aktualizuje titulek
+        pdfModalLabel.textContent = filename;
     }
 
     // Najdi modal a otevři ho

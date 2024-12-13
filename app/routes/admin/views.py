@@ -53,7 +53,10 @@ import re
 #   2.1.3 def prohlizet
 #   2.1.4 def intra
 #   2.1.5 def o_projektu
-
+# LOGICKÉ ŘĚŠENÍ - /prohliže.html --> /prohlizet_data.html
+#   - cílem je, zpracovat data, a servirovat je s renederovanou strnákou
+#   - po prvním nacteni dat serverem a vraceni uzivateli, bude velmi rychle vraceni dat (server-side renedering)
+#   - poku nyni jsou k dispozici data, je mozne na strane prohlizece, vykonovata js AJAX a Fetch
 ##
 
 #=========================================================================================================
@@ -78,6 +81,10 @@ def home():
 
     # Renderuje šablonu a předává výsledky a query
     return render_template('home.html', results=results_list, query=query)
+
+'''
+účelem routy je poskytnout hlavní stránku aplikace, kde uživate může zadat dotaz a zobrazit výsledky hledání v šablone dome.html
+'''
 #=========================================================================================================
 # Route zodpovedny za AJAX na render route def home
 @admin_bp.route('/autocomplete')
@@ -86,7 +93,7 @@ def autocomplete():
     query = request.args.get('query', '').strip().lower()
     results = []
 
-    session = Session() # vytvoreni nove session pro okamzity progres
+    session = Session() # vytvoreni nove db. relace session pro okamzity progres
     try:
         if query:
             # Vyhledávání na základě názvu souboru nebo obsahu
@@ -105,14 +112,16 @@ def autocomplete():
             'directory': file.directory[file.directory.find('/pdfs/'):] if file.directory.find('/pdfs/') != -1 else '/pdfs/'# Udržuje vše od /pdfs/ a dál a pokud se nenajde vrati /pdfs/
         } for file in results
     ])
-
+'''
+Účelem route je dynamicky navrhovat zadvávání dotazu v textovém poli
+'''
 #=========================================================================================================
 #=========================================================================================================
+# server-side rendering pro prvotní načtení a zobrazeni dat
 @admin_bp.route('/prohlizet')
 def prohlizet():
 
     return render_template('prohlizet.html')
-
 
 #=========================================================================================================
 # Route pro ziskavani JSON dat
@@ -123,6 +132,7 @@ def prohlizet_data():
     session = Session()  # Inicializace session
     item_files = []
     try:
+
         # Načtení všech souborů
         item_files = session.query(Files).all()
     except Exception as e:
@@ -135,13 +145,17 @@ def prohlizet_data():
     return jsonify([
         {
             'filename': file.filename,
-            'kontent': file.kontent[:400] if file.kontent else '',  # Ořízne kontent na 400 znaků
-            'directory': file.directory[file.directory.find('/pdfs/'):] if file.directory and file.directory.find(
-                '/pdfs/') != -1 else '/pdfs/'
+            'kontent': file.kontent[:1600] if file.kontent else '',  # Ořízne kontent na 400 znaků
+            'directory': file.directory.split('/pdfs/', 1)[-1] if file.directory and '/pdfs/' in file.directory else ''
+            #'directory': file.directory[file.directory.find('/pdfs/'):] if file.directory and file.directory.find('/pdfs/') != -1 else '/pdfs/'
         } for file in item_files
     ])
 
+#=========================================================================================================
+@admin_bp.route('release.html')
 
+def release():
+    return render_template('release.html')
 #=========================================================================================================
 #=========================================================================================================
 

@@ -1,6 +1,6 @@
 # Název webové stránky
 # Tento název se zobrazuje v záhlaví webové stránky
-site_name: Bezpečnostní list
+site_name: Bezpečnostní listy
 
 # Adresář pro dokumenty
 # Určuje, kde se nacházejí Markdown soubory, které MkDocs použije pro generování webových stránek
@@ -11,36 +11,160 @@ docs_dir: docs
 theme:
   name: 'material'
 
-
   palette:
-    
     # Palette toggle for light mode
-    - scheme: default
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
       toggle:
-        icon: material/brightness-7 
+        icon: material/brightness-7
         name: Switch to dark mode
 
     # Palette toggle for dark mode
-    - scheme: slate
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: default
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
 
-# Navigační menu
+
+  features:
+        # Povolení záložek (tabs) v navigaci pro snadný přechod mezi sekcemi.
+        - navigation.tabs
+
+        # Aktivace instantní navigace, která umožňuje přechody mezi stránkami bez kompletního načítání.
+        - navigation.instant
+
+        # Aktivace indikátoru pokroku pro instantní navigaci (v tuto chvíli zakomentováno).
+        # - navigation.instant.progress
+
+        # Aktivace zobrazení navigace na dolní části stránky (footer).
+        - navigation.footer
+
+        # Povolení sekcí v navigaci pro lepší organizaci obsahu do logických částí.
+        - navigation.sections
+
+        # Aktivace zobrazení vyhledávacího pole na stránce.
+        # - search
+
+        # Aktivace animovaných efektů pro přechody mezi stránkami.
+        # - animations
+
+        # Povolení možnosti pro zobrazení kontaktního formuláře.
+        # - contact.form
+
+        # Aktivace zobrazení postranního panelu (sidebar) s navigací.
+        # - navigation.sidebar
+
+        # Aktivace automatického generování metadat pro SEO.
+        # - seo
+
+        # Aktivace možnosti pro vlastní logo v hlavičce stránky.
+        # - logo
+
+        # Aktivace možnosti pro zobrazení seznamu všech souvisejících dokumentů.
+        # - related.documents
+
+plugins:
+  # NEZAPOMEN INSTALOVAT DO requirements.tx!!
+  # Aktivace vyhledávání v dokumentaci.
+  - search
+
+  # Aktivace pluginu glightbox pro zobrazení obrázků ve vyskakovacím okně s různými nastaveními.
+  # - glightbox:
+      # Povolení navigace pomocí dotyku na mobilních zařízeních.
+      #touchNavigation: true
+
+      # Zakázání smyčky při prohlížení obrázků (po posledním obrázku se nevrací zpět na první).
+      #loop: false
+
+      # Efekt zobrazení obrázku při otevření (zoom efekt).
+      #effect: zoom
+
+      # Efekt přechodu mezi snímky při prohlížení (slide efekt).
+      #slide_effect: slide
+
+      # Nastavení šířky zobrazeného obrázku (100% šířka dostupného prostoru).
+      #width: 100%
+
+      # Nastavení výšky zobrazeného obrázku (auto znamená automatické přizpůsobení výšky).
+      #height: auto
+
+      # Povolení zoomování obrázků.
+      #zoomable: true
+
+      # Povolení přetahování obrázku myší.
+      #draggable: true
+
+      # Seznam tříd, které mají být ignorovány (nezobrazují se v glightboxu).
+      #skip_classes:
+      #  - custom-skip-class-name
+
+      # Automatické přidání popisku k obrázku (zakázáno).
+      #auto_caption: false
+
+      # Umístění popisku (na spodní části obrázku).
+      #caption_position: bottom
+
+      # Nastavení pozadí glightboxu (bílé).
+      #background: white
+
+      # Aktivace stínu kolem obrázku v glightboxu.
+      #shadow: true
+
+      # Nastavení manuálního režimu pro ovládání glightboxu.
+      #manual: false
+
+extra:
+  # Zakázání generování meta tagu pro generátora dokumentu.
+  generator: false
+
+  # Zakomentované možnosti pro extra nastavení (neaktivní):
+
+  # Aktivace možnosti pro vlastní favicon.
+  # favicon: path/to/favicon.ico
+
+  # Přidání vlastního JavaScriptu do dokumentace.
+  # javascript: path/to/script.js
+
+  # Aktivace generování RSS feedu pro dokumentaci.
+  # rss: true
+
+  # Aktivace automatického generování souboru pro generování PDF.
+  # pdf: true
+
+  # Přidání vlastního CSS pro vlastní styly.
+  # custom_css: path/to/styles.css
+
+
+
 # Určuje strukturu a pořadí stránek v navigačním menu
 nav:
-  - Home: README.md
+  - Home:
+    - 'Představení': README.md
+    - 'Použití': README.md
+    - 'Logika': README.md
     # Odkazuje na soubor README.md, který se zobrazuje jako úvodní stránka
 
-  - Architectura aplikace: Docker.md
-    # Odkazuje na soubor Docker.md v podadresáři docs, který obsahuje informace o architektuře aplikace
+  - Architectura aplikace:
+    - 'Docker': Docker.md
+    - 'Orchestrace': Docker.md
 
-  - Flask: Flask.md
+  - Flask:
+    - 'Aplikace': Flask.md
+    - 'Routing a Blueprint':
+        - 'Blueprint': flask/blueprint.md
+        - 'Views': flask/views/views.md
+        - 'Templates': flask/templates.md
+
+    - 'Jinja2': Flask.md
+    - 'templating': Flask.md
+
   - Database: Databes.md
+
   - nginx: Nginx.md
-
   - Koncepce: Koncepce.md
-
   - Nastaveni: nastaveni.md
     # Odkazuje na soubor nastaveni.md, který obsahuje informace o nastavení
 

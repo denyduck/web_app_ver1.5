@@ -110,6 +110,7 @@ function handleSearchInput() {
         clearSuggestions();
     }
 }
+
 // ==========================================================
 // ============ PRÁCE S NÁSEPTÁVÁČEM ========================
 
@@ -222,6 +223,7 @@ function populateResultsList(data) {
     resultsModal.show();
 }
 
+
 // Funkce pro zpracování kliknutí na položku v seznamu výsledků
 function handleResultClick(item) {
     console.log(item)
@@ -234,6 +236,7 @@ function handleResultClick(item) {
     pdfModal._element.addEventListener('shown.bs.modal', function() {
         pdfIframe.src = `${item.directory}/${item.filename}`;
     });
+
     clearSuggestions();
 }
 

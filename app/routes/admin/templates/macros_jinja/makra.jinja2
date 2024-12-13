@@ -162,6 +162,8 @@ SEZNAM MAKER
       <div class="text-center flex-grow-1">
 
         <span class="text-muted">&copy; 2024 DM | <a href="{{ url_for('routes.admin.o_projektu') }}" class="text-muted text-decoration-none">O projektu</a> | poslední aktualizace proběla: 10.12.2024
+        |
+
         </span><br>
 
 
@@ -174,9 +176,9 @@ SEZNAM MAKER
 ===========================================================
 
 {% macro footer() %}
-    <footer class="bg-dark text-light py-5 mt-5">
+    <footer class="bg-dark text-light py-5 mt-8" style="margin-top=10%;">
         <div class="container">
-            <div class="row">
+            <div class="row justify-content-center ">
                 <!-- O projektu a O firmě -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5 class="text-uppercase">O projektu</h5>
@@ -192,15 +194,7 @@ SEZNAM MAKER
                         <li class="nav-item mb-2">
                             <a href="#" class="nav-link p-0 text-muted">O projektu</a>
                         </li>
-                        <li class="nav-item mb-2">
-                            <a href="#" class="nav-link p-0 text-muted">O firmě</a>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="#" class="nav-link p-0 text-muted">Volné pozice</a>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="#" class="nav-link p-0 text-muted">Kontakt</a>
-                        </li>
+
                     </ul>
                 </div>
 
@@ -209,35 +203,13 @@ SEZNAM MAKER
                     <h5 class="text-uppercase">Kontakt</h5>
                     <ul class="list-unstyled">
                         <li>
-                            <i class="bi bi-geo-alt-fill me-2"></i> Adresa: Ulice 123, 100 00 Praha
-                        </li>
-                        <li>
-                            <i class="bi bi-telephone-fill me-2"></i> Telefon: +420 123 456 789
-                        </li>
-                        <li>
                             <i class="bi bi-envelope-fill me-2"></i> Email: info@firma.cz
                         </li>
                     </ul>
                 </div>
 
                 <!-- Sociální sítě -->
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="text-uppercase">Sledujte nás</h5>
-                    <div class="d-flex">
-                        <a href="#" class="text-light me-3">
-                            <i class="bi bi-facebook" style="font-size: 1.5rem;"></i>
-                        </a>
-                        <a href="#" class="text-light me-3">
-                            <i class="bi bi-twitter" style="font-size: 1.5rem;"></i>
-                        </a>
-                        <a href="#" class="text-light me-3">
-                            <i class="bi bi-linkedin" style="font-size: 1.5rem;"></i>
-                        </a>
-                        <a href="#" class="text-light">
-                            <i class="bi bi-instagram" style="font-size: 1.5rem;"></i>
-                        </a>
-                    </div>
-                </div>
+
             </div>
 
             <!-- Copyright -->

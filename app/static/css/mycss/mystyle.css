@@ -243,7 +243,6 @@ font-size: 1.5rem; /* Velikost ikony lupy */
 
 
 
-
 @media (max-width: 576px) {
 .text-brand {
     display: none; /* Skrýt text na menších obrazovkách */
@@ -323,7 +322,7 @@ font-size: 1.5rem; /* Velikost ikony lupy */
 /* Stylování hlavičky accordionu */
 .accordion-header {
     background-color: #40916c;
-    opacity: 0.8;
+    opacity: none;
     border: none !important; /* Přidání !important pro přepsání */
 }
 
