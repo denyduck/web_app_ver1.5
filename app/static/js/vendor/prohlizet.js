@@ -16,17 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return; // Ukončí funkci, pokud není element nalezen
     }
 
-    // Zobrazí spinner při načítání dat
+    // 1. Vytvoří spinner (označení A)
     const loadingSpinner = document.createElement('div');
     loadingSpinner.classList.add('spinner-border', 'text-primary');
     loadingSpinner.setAttribute('role', 'status');
     loadingSpinner.innerHTML = '<span class="visually-hidden">Načítání...</span>';
-    accordionContainer.appendChild(loadingSpinner);
-
-    // Zpoždění pro simulaci čekání před načtením souborů
-    setTimeout(() => {
-        loadFiles();
-    }, 1000);  // Zpoždění 1 sekunda (1000 ms) před načtením souborů
+    accordionContainer.appendChild(loadingSpinner); // Spinner přidán do DOM
 
     // Funkce pro načítání souborů s indikátorem
     function loadFiles() {
@@ -38,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(files => {
-                // Odstraní spinner
-                accordionContainer.innerHTML = '';
+                // 2. Odstraní spinner po úspěšném načtení dat (označení B)
+                loadingSpinner.remove();
 
                 if (files.length === 0) {
                     accordionContainer.innerHTML = `
@@ -96,12 +91,17 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Chyba při načítání souborů:', error);
+                // 3. Odstraní spinner při chybě (označení C)
+                loadingSpinner.remove();
                 accordionContainer.innerHTML = `
                     <div class="alert alert-danger text-center">
                         Chyba při načítání dat ze serveru.
                     </div>`;
             });
     }
+
+    // Zavolání funkce pro načtení souborů
+    loadFiles();
 });
 
 // Funkce pro otevření modálního okna s náhledem PDF
