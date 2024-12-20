@@ -2,36 +2,36 @@
 
 <!doctype html>
 <html lang="cs">
+
   <head>
-    <!--importy a meta data stranky-->
+    <!-- importy a meta data stránky -->
     {{ makra.header() }}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!--pojmenovani stranky-->
+    <!-- pojmenování stránky -->
     {{ makra.title("home") }}
   </head>
-
+  {{ makra.navbar(False) }}
   <body data-bs-theme="dark">
-    <!--navigacni bar bez vyhledavace 'False'-->
-    {{ makra.navbar(False) }}
+    <!-- navigační bar bez vyhledávače 'False' -->
+    
 
-      <!-- Hlavní obsah -->
+    <!-- Hlavní obsah -->
     <div class="content">
 
       <div class="container d-flex justify-content-center align-items-center" style="min-height: 30vh;">
         <div class="col-12 col-md-9 col-lg-9 text-center mx-auto">
           <h1 class="custom-heading mb-1">Kniha bezpečnostních listů</h1>
-          <p class="col-12  custom-headingfor">Vyhledávej podle názvu látky, označení, klíčového slova...</p>
+          <p class="col-12 custom-headingfor">Vyhledávej podle názvu látky, označení, klíčového slova...</p>
         </div>
       </div>
 
-
-          <!-- Hlavní vyhledávací formulář -->
+      <!-- Hlavní vyhledávací formulář -->
       <div class="container">
         <div class="row justify-content-center" style="min-height: 10vh;">
           <div class="col-md-8 col-lg-6 d-flex justify-content-center align-items-center">
-            <div class="position-relative w-100"> <!-- Přidání wrapperu pro relative pozici -->
+            <div class="position-relative w-100">
               <!-- Návrhy pro vyhledávání -->
-              <div id="suggestions" class="list-group position-absolute " style="z-index: 5; display: none; width: 450px; top: 100%; left: 40px; max-height: 300px; border: 2px solid #5F6164; border-top: 0px; border-radius: 0 0 0.5rem 0.5rem;">
+              <div id="suggestions" class="list-group position-absolute" style="z-index: 5; display: none; width: 450px; top: 100%; left: 40px; max-height: 300px; border: 2px solid #5F6164; border-top: 0px; border-radius: 0 0 0.5rem 0.5rem;">
                 <!-- Zde mohou být návrhy pro vyhledávání -->
               </div>
 
@@ -67,37 +67,35 @@
         {% if results %}
           <ul class="list-group">
             {% for result in results %}
-              <li class="list-group-item ">
-                <!--zde bude zorbazoveni pdf-->
+              <li class="list-group-item">
+                <!-- zobrazení pdf -->
                 <button class="btn btn-link" onclick="openPdfModal('/pdfs/{{ result.filename }}')">
                   {{ result.filename }}
                 </button>
-                <!--<a href="/pdfs/{{ result.filename }}" target="_blank">{{ result.filename }}</a> -->
               </li>
             {% endfor %}
           </ul>
         {% else %}
-          <!--p class="text-center">Žádné výsledky nenalezeny./p -->
+          <!-- <p class="text-center">Žádné výsledky nenalezeny.</p> -->
         {% endif %}
       </div>
 
-
+      <!-- Modal pro PDF -->
       <div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable modal-xl">
-
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="pdfModalLabel">PDF Náhled</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
             </div>
             <div class="modal-body">
-              <iframe id="pdfIframe" style="width: 100%; height: 1000px;" frameborder="0"></iframe>
+              <iframe id="pdfIframe" style="width: 100%; height: 80vh;" frameborder="0"></iframe>
             </div>
           </div>
         </div>
       </div>
 
-
+      <!-- Sekce pro karty -->
       <div class="container">
         <div class="row" style="margin-top: 100px">
           <!-- Hořlavé -->
@@ -145,14 +143,10 @@
           </div>
         </div>
       </div>
+
     </div>
 
-
-
     {{ makra.footer_dve() }}
-
-
-
 
     <!-- Modální okno pro seznam výsledků -->
     <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
@@ -171,9 +165,7 @@
       </div>
     </div>
 
-
-
-
+    <!-- Načítací indikátor -->
     <div id="loader" style="display:none;">
       <p>Načítání...</p>
     </div>
@@ -186,6 +178,5 @@
     <script src="{{ url_for('static', filename='js/vendor/my.js') }}"></script>
 
   </body>
-
 
 </html>

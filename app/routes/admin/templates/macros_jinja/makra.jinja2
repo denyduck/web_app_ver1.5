@@ -56,7 +56,7 @@ SEZNAM MAKER
           <span class="ms-3 text-brand">Bezpečnostní list</span>
         </a>
 
-        <!-- Vhledavac -->
+        <!-- Vyhledavac -->
         {% if is_home_page %}
         <form class="d-flex mx-auto my-2 my-lg-0" role="search" style="flex: 1; max-width: 400px;"></form>
           <div class="d-flex align-items-center">
@@ -139,6 +139,8 @@ SEZNAM MAKER
             </li>
           </ul>
         </div>
+
+        
       </div>
     </header>
 {% endmacro %}
@@ -176,57 +178,58 @@ SEZNAM MAKER
 ===========================================================
 
 {% macro footer() %}
-    <footer class="bg-dark text-light py-5 mt-8" style="margin-top=10%;">
-        <div class="container">
-            <div class="row justify-content-center ">
-                <!-- O projektu a O firmě -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <h5 class="text-uppercase">O projektu</h5>
-                    <p class="small text-muted">
-                        Tento projekt slouží ke správě a vyhledávání bezpečnostních listů látek. Naším cílem je zlepšit přístup k důležitým informacím o nebezpečných látkách a jejich bezpečném používání.
-                    </p>
-                </div>
+<footer class="bg-dark text-light py-5 mt-8" style="margin-top=10%;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <!-- O projektu -->
+      <div class="col-lg-4 col-md-6 mb-4">
+        <h5 class="text-uppercase">O projektu</h5>
+        <p class="small text-muted">
+          Tento projekt slouží ke správě a vyhledávání bezpečnostních listů látek. Naším cílem je zlepšit přístup 
+          k důležitým informacím o nebezpečných látkách a jejich bezpečném používání.
+        </p>
+      </div>
 
-                <!-- Rychlé odkazy -->
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="text-uppercase">Rychlé odkazy</h5>
-                    <ul class="nav flex-column">
-                        <li class="nav-item mb-2">
-                            <a href="#" class="nav-link p-0 text-muted">O projektu</a>
-                        </li>
+      <!-- Rychlé odkazy -->
+      <div class="col-lg-2 col-md-6 mb-4">
+        <h5 class="text-uppercase">Rychlé odkazy</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2">
+            <a href="#" class="nav-link p-0 text-muted">O projektu</a>
+          </li>
+        </ul>
+      </div>
 
-                    </ul>
-                </div>
+      <!-- Kontakt -->
+      <div class="col-lg-3 col-md-6 mb-4">
+        <h5 class="text-uppercase">Kontakt</h5>
+        <ul class="list-unstyled">
+          <li>
+            <i class="bi bi-envelope-fill me-2"></i> Email: info@firma.cz
+          </li>
+        </ul>
+      </div>
+    </div>
 
-                <!-- Kontakt -->
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="text-uppercase">Kontakt</h5>
-                    <ul class="list-unstyled">
-                        <li>
-                            <i class="bi bi-envelope-fill me-2"></i> Email: info@firma.cz
-                        </li>
-                    </ul>
-                </div>
+    <!-- Copyright -->
+    <div class="row mt-4">
+      <div class="col text-center">
+        <p class="text-muted small">
+          &copy; 2024 DM. Všechna práva vyhrazena. |
+          <a href="#" class="text-muted">Zásady ochrany osobních údajů</a> |
+          <a href="#" class="text-muted">Podmínky užívání</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
 
-                <!-- Sociální sítě -->
+<!-- JavaScript knihovny -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-            </div>
-
-            <!-- Copyright -->
-            <div class="row mt-4">
-                <div class="col text-center">
-                    <p class="text-muted small">&copy; 2024 DM. Všechna práva vyhrazena. | <a href="#" class="text-muted">Zásady ochrany osobních údajů</a> | <a href="#" class="text-muted">Podmínky užívání</a></p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JavaScript knihovny -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Odkaz na vlastní JavaScript soubor -->
-    <script src="{{ url_for('static', filename='js/vendor/my.js') }}"></script>
+<!-- Odkaz na vlastní JavaScript soubor -->
+<script src="{{ url_for('static', filename='js/vendor/my.js') }}"></script>
 {% endmacro %}
 ===========================================================
 5. SIDEBAR

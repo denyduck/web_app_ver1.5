@@ -1,373 +1,305 @@
-/* VLASTNI STYLEe
-1. Definice těla uvdní stránky
-    1.1 Přepínání režimu
-2. Styly pro navbar a jeho prvky
-    2.1 Oddělovač
-    2.2 Hover navigace
-    2.3 Ikona v navigaci
+/* ======================================================================
+   VLASTNÍ STYLY (OBSAH)
+   ======================================================================
+   1. Obecné styly
+      1.1 Přepínání režimu (tmavý/světlý)
+   2. Navbar a jeho prvky
+      2.1 Oddělovač
+      2.2 Hover navigace
+      2.3 Ikona v navigaci
+   3. Vyhledávací pole
+      3.1 Styl pole na úvodní stránce
+      3.2 Styl masky
+   4. Fonty a velikost textu
+      4.1 Velké písmo
+      4.2 Střední písmo
+   5. Footer
+   6. Sidebar pro vertikální menu
+      6.1 Odkazy v menu
+      6.2 Hover efekt
+   7. Vyhledávací pole (vnitřní stránky)
+      7.1 Placeholder
+      7.2 Ikona vyhledávače
+      7.3 Dropdown menu návrhů
+   8. Responzivní styly
+      8.1 Nadpisy
+      8.2 Skrytí prvků na mobilech
+   9. Karty
+  10. Loader
+  11. Accordion
+  12. Modal okna
+====================================================================== */
 
-3. Vyhledávací pole - uvodní stránka
-    3.1 Maska
-
-4. Úpráva fontu, velikosti,...
-    4.1 Zvětšování písma BIG
-    4.2 Zvětšování písma MEDIUM
-
-5. Footer
-6. Sidebar pro vertikalni menu
-    6.1 Odstavec pro menu
-    6.2 Hover pro menu
-
-7. Vyhledávací pole - inside page
-    7.1 Placeholder pro ikonu
-    7.2 Ikona vyhledávače (lupa)
-    7.3 Vyhledavac v navbaru 
-    7.4 Stylovani group items ktere dynamicky vapdavaji do dropdownmenu
-
-8. Úvodní popisek na home - respozivní
-9.
-
-*/
-
-/*======================================================================*/
-/* 1. styl pro úvodní body stranku a jehí prvky*/
-/*======================================================================*/
+/* ======================================================================
+   1. Obecné styly
+====================================================================== */
 html, body {
-  height: 100%; /* Zajistí, že body a html budou plné výšky viewportu */
+  height: 100%;
   margin: 0;
 }
 
 body {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Zajišťuje, že body bude mít minimální výšku 100% viewportu */
+  min-height: 100vh;
 }
 
 footer {
-  margin-top: auto; /* Zajistí, že footer bude na konci stránky */
-
+  margin-top: auto;
 }
 
-
-
-/* 1.1 Styl pro dynamické přepínání režimu */
+/* 1.1 Přepínání režimu */
 body[data-theme='dark'] {
-    background-color: #333;
-    color: white;
-
+  background-color: #333;
+  color: white;
 }
+
 body[data-theme='light'] {
-    background-color: #fff;
-    color: black;
+  background-color: #fff;
+  color: black;
 }
 
-
-
-
-
-
-
-
-/*======================================================================*/
-/* 2. Navbar a jeho prvky */
-/*======================================================================*/
-/* 2.1 Styl pro oddělovač mezi navigačními položkami a dropdown menu */
+/* ======================================================================
+   2. Navbar a jeho prvky
+====================================================================== */
 .navbar .nav-item.separator::after {
-    content: "";
-    display: inline-block;
-    width: 1px; /* Šířka oddělovače */
-    height: 1.5rem; /* Výška oddělovače */
-    background-color: #fff; /* Barva oddělovače */
-    margin: 0 0.5rem; /* Okraje kolem oddělovače */
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 1.5rem;
+  background-color: #fff;
+  margin: 0 0.5rem;
 }
 
-/* 2.2 Styl pro tlačítka při hoveru v navigacním panelu*/
 button:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-2px);
-    transition: all 0.3s ease;
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }
 
-/* 2.3 Styl pro ikonu v navigaci */
 .navbar-brand i {
-    font-size: 2rem;
-    margin-bottom: 2px;
+  font-size: 2rem;
+  margin-bottom: 2px;
 }
 
-/*======================================================================*/
-/* 3. Styl pro vyhledávací pole */
-/*======================================================================*/
+/* ======================================================================
+   3. Vyhledávací pole
+====================================================================== */
 .form-control-search {
-    height: 3rem; /* Zvětšení výšky vyhledávacího pole */
-    font-size: 1rem; /* Změna velikosti písma v inputu */
+  height: 3rem;
+  font-size: 1rem;
 }
 
-/* 3.1 Styl pro kartu s maskováním ve vyhledávacím poli*/
 .mask-custom {
-    background: rgba(24, 24, 16, .2);
-    border-radius: 3rem;
-    backdrop-filter: blur(15px);
-    border: 4px solid rgba(255, 255, 255, 0.274);
-    background-clip: padding-box;
-    box-shadow: 10px 10px 10px rgba(46, 54, 68, 0.03);
+  background: rgba(24, 24, 16, 0.2);
+  border-radius: 3rem;
+  backdrop-filter: blur(15px);
+  border: 4px solid rgba(255, 255, 255, 0.27);
+  box-shadow: 10px 10px 10px rgba(46, 54, 68, 0.03);
 }
 
-
-.mask-custom.border {
-    border: 1px solid rgba(255, 255, 255, 0.274);
-}
-
-
-
-/*======================================================================*/
-/* 4. Fonty, velikost, atd */
-/*======================================================================*/
-
-/* 4.1 Zvětšování písma */
+/* ======================================================================
+   4. Fonty a velikost textu
+====================================================================== */
 .big-font {
-    font-size: 5rem;
+  font-size: 5rem;
 }
 
-/* 4.2 Velikost písma pro střední texty */
 .md-font {
-font-size: 2rem;
+  font-size: 2rem;
 }
 
-/*======================================================================*/
-/* 5. Flexbox pro patičku, aby byla vždy dole */
-/*======================================================================*/
+/* ======================================================================
+   5. Footer
+====================================================================== */
+footer {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background-color: #333;
+  color: white;
+}
 
-
-/*======================================================================*/
-/* 6. Sidebar pro vertikalni menu*/
-/*======================================================================*/
+/* ======================================================================
+   6. Sidebar pro vertikální menu
+====================================================================== */
 .vertical-menu {
-    display: flex;
-    flex-direction: column;
-    background-color: transparent; /* Barva pozadí menu */
-    padding: 20px;
-    width: auto; /* Šířka menu */
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  padding: 20px;
 }
 
-/* 6.1 Sidebar pro vertikalni menu - odstavec*/
 .vertical-menu a {
-    color: #ffffff;
-    text-decoration: none;
-    padding: 10px;
-    display: block;
-    border-radius: 5px;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px;
+  display: block;
+  border-radius: 5px;
 }
 
-/* 6.1 Sidebar pro vertikalni menu - hover items*/
 .vertical-menu a:hover {
-    background-color: #495057; /* Barva pozadí při najetí myší */
+  background-color: #495057;
 }
 
-
-
-/*======================================================================*/
-/* 7. Vyhledávací pole - inside page */
-/*======================================================================*/
+/* ======================================================================
+   7. Vyhledávací pole (vnitřní stránky)
+====================================================================== */
 .btn-search {
-    height: 2rem;
-    border-radius: 3em;
-    font-size: 1rem;
-
-    justify-content: center;
+  height: 2rem;
+  border-radius: 3em;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
 }
 
-
-/* 7.1 placeholder pro ikonu a ikona*/
 .form-control-search::placeholder {
-    color: rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
 }
 
-
-/* 7.2 ikona */
 .search-icon {
-font-size: 1.5rem; /* Velikost ikony lupy */
+  font-size: 1.5rem;
 }
-
-
-#suggestions {
-    position: relative;
-    background-color: #fff;
-    overflow-y: auto;
-}
-
-
-
-
-
-
 
 .list-group-item {
-    cursor: pointer;
+  cursor: pointer;
 }
 
-/* Zobrazit návrhy, když jsou k dispozici */
 .list-group-item:hover {
-    background-color: dark;
+  background-color: #f0f0f0;
 }
 
-
-/*======================================================================*/
-/* 8. Respozivní text na úvodní stránce - i pro mnobilní rozlišení*/
-/*======================================================================*/
-/* 8. Nadpis + podnadpis */
+/* ======================================================================
+   8. Responzivní styly
+====================================================================== */
 .custom-heading {
-    font-size: 5rem; /* Velikost textu pro velké obrazovky */
+  font-size: 5rem;
 }
 
 .custom-headingfor {
-    font-size: 2rem;
+  font-size: 2rem;
 }
 
 @media (max-width: 768px) {
-.custom-heading {
-    font-size: 4rem; /* Menší velikost textu pro tablety */
-}
-.custom-headingfor {
-    font-size: 2rem;
-    }
+  .custom-heading {
+    font-size: 4rem;
+  }
+
+  .custom-headingfor {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 576px) {
-.custom-heading {
-    font-size: 3rem; /* Ještě menší velikost textu pro mobily */
-}
-.custom-headingfor {
-    font-size: 2rem;
-    }
-}
+  .custom-heading {
+    font-size: 3rem;
+  }
 
-
-
-@media (max-width: 576px) {
-.text-brand {
-    display: none; /* Skrýt text na menších obrazovkách */
-    }
+  .text-brand {
+    display: none;
+  }
 }
 
-
-
-
-
-
+/* ======================================================================
+   9. Karty
+====================================================================== */
 .card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Standardní */
-    -webkit-transition: transform 0.3s ease, box-shadow 0.3s ease; /* Safari */
-    -moz-transition: transform 0.3s ease, box-shadow 0.3s ease; /* Firefox */
-    -o-transition: transform 0.3s ease, box-shadow 0.3s ease; /* Opera */
-    -ms-transition: transform 0.3s ease, box-shadow 0.3s ease; /* IE */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    -webkit-transform: translateY(-5px); /* Safari */
-    -moz-transform: translateY(-5px); /* Firefox */
-    -o-transform: translateY(-5px); /* Opera */
-    -ms-transform: translateY(-5px); /* IE */
+  transform: translateY(-5px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-
-/* Styl pro loader */
+/* ======================================================================
+   10. Loader
+====================================================================== */
 .loader {
-  position: fixed; /* Zajišťuje, že loader je vždy v popředí */
-  top: 50%; /* Umístí loader na střed obrazovky */
+  position: fixed;
+  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* Centering */
-  text-align: center; /* Centering text */
-  z-index: 1000; /* Zajišťuje, že loader je nad ostatními prvky */
-  background: rgba(255, 255, 255, 0.8); /* Poloprůhledné pozadí */
-  border-radius: 8px; /* Zaoblené rohy */
-  padding: 20px; /* Vnitřní okraje */
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Stín */
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
-/* Styl pro spinner */
 .spinner {
-  border: 5px solid #f3f3f3; /* Světlejší barva */
-  border-top: 5px solid #3498db; /* Tmavší barva */
-  border-radius: 50%; /* Kulatý tvar */
-  width: 30px; /* Šířka spinneru */
-  height: 30px; /* Výška spinneru */
-  animation: spin 1s linear infinite; /* Animace rotace */
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
 }
 
-/* Animace pro rotaci */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-
-
-
-
-/* Zrušení rámečků pro celý accordion */
+/* ======================================================================
+   11. Accordion
+====================================================================== */
 .accordion-item {
-    border: none !important; /* Přidání !important pro silnější přepsání */
+  border: none !important;
 }
 
-/* Zrušení rámečku při hover */
-.accordion-item:hover {
-    background-color: none !important;
-    border: none !important; /* Zrušení borderu při hover */
-    box-shadow: none !important; /* Zrušení box-shadow při hover */
-}
-
-/* Stylování hlavičky accordionu */
 .accordion-header {
-    background-color: #40916c;
-    opacity: none;
-    border: none !important; /* Přidání !important pro přepsání */
+  background-color: #40916c;
+  border: none !important;
 }
 
-/* Zrušení borderu při hover na hlavičku */
-.accordion-header:hover {
-    border: none !important; /* Zrušení borderu při hover */
-    box-shadow: none !important; /* Zrušení shadow efektu při hover */
-}
-
-/* Tlačítko */
 .accordion-button {
-    background-color: #2d6a4f !important;
-    color: white !important;
-    border-radius: 0px;
-    border: none !important; /* Zrušení rámečku na tlačítku */
-    outline: none !important; /* Odstranění focus obrysu */
-    box-shadow: none !important; /* Odstranění box-shadow */
+  background-color: #2d6a4f !important;
+  color: white !important;
+  border: none !important;
+  outline: none !important;
 }
 
-/* Zrušení rámečku při hover na tlačítku */
-.accordion-button:hover {
-    background-color: #1b4332 !important; /* Změna barvy při hover */
-    border: none !important; /* Zrušení rámečku při hover */
-    outline: none !important; /* Odstranění focus rámečku při hover */
-    box-shadow: none !important; /* Zrušení stínu při hover */
-}
-
-/* Zrušení rámečku při focusu na tlačítku */
-.accordion-button:focus {
-    outline: none !important; /* Odstranění focus rámečku */
-    box-shadow: none !important; /* Zrušení stínu při focus */
-}
-
-/* Změna barvy šipky (collapse icon) na červenou */
 .accordion-button::after {
-    color: red !important; /* Červená barva pro šipku */
-    font-size: 1.5em; /* Možná je potřeba upravit velikost šipky */
+  color: red !important;
+  font-size: 1.5em;
 }
 
-/* Změna barvy šipky na tmavší červenou při hover */
-.accordion-button:hover::after {
-    color: darkred !important; /* Tmavší červená při hover */
+/* ======================================================================
+   12. Modal okna
+====================================================================== */
+.modal-dialog {
+  max-width: 60%;
+  margin: 1.75rem auto;
 }
 
-/* Změna barvy šipky pro otevřený accordion (rozevřený panel) */
-.accordion-button:not(.collapsed)::after {
-    color: red !important; /* Zůstane červená i pro otevřený panel */
+@media (max-width: 1000px) {
+  .modal-dialog {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .modal-body iframe {
+    height: 80vh;
+  }
+}
+
+
+
+
+
+.pagination {
+  margin: 0;
+  padding: 0;
+}
+
+.page-link {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
 }
