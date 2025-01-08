@@ -152,7 +152,7 @@ def prohlizet_data():
     ])
 
 #=========================================================================================================
-@admin_bp.route('release.html')
+@admin_bp.route('/release.html')
 
 def release():
     return render_template('release.html')
@@ -162,6 +162,7 @@ def release():
 @admin_bp.route('/intra')
 def intra():
     return render_template('intra.html')
+
 
 @admin_bp.route('/o_projektu')
 def o_projektu():

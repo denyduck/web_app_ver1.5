@@ -16,7 +16,10 @@ SEZNAM MAKER
 ===========================================================
 1. HLAVICKA A IMPORTY
 ===========================================================
+
+
 {% macro header() %}
+
     <!--MAKRO "header"-->
     <!-- META TAGS -->
     <meta charset="utf-8">  <!-- Definuje kódování znaků dokumentu -->
@@ -35,25 +38,33 @@ SEZNAM MAKER
     <!-- Odkaz na externí ikonkový framework Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"> 
     <!--END-MAKRO-->
+
 {% endmacro %}
+
+
 ===========================================================
 2. NAZEV STRANKY
 ===========================================================
+
 
 {% macro title(text) %}
     <title>{{ text }}</title>
 {% endmacro%}
 
+
 ===========================================================
 3. NAVBAR
 ===========================================================
+
+
 {% macro navbar(is_home_page=True) %}
+
     <header class="navbar navbar-expand-lg bg-success">
       <div class="container ">
         <!-- Ikona a název webu -->
         <a class="navbar-brand d-flex align-items-center" href="{{ url_for('routes.admin.home')}}">
           <i class="fa-solid fa-book-open-reader big-font"></i>
-          <span class="ms-3 text-brand">Bezpečnostní list</span>
+          <span class="ms-3 text-brand">Bezpečnostní listy</span>
         </a>
 
         <!-- Vyhledavac -->
@@ -143,7 +154,10 @@ SEZNAM MAKER
         
       </div>
     </header>
+
 {% endmacro %}
+
+
 ===========================================================
 4. PATIČKA
 ===========================================================
@@ -164,10 +178,9 @@ SEZNAM MAKER
       <div class="text-center flex-grow-1">
 
         <span class="text-muted">&copy; 2024 DM | <a href="{{ url_for('routes.admin.o_projektu') }}" class="text-muted text-decoration-none">O projektu</a> | poslední aktualizace proběla: 16.12.2024
-        |
+        | <a href="{{ url_for('routes.admin.release')}}" class="text-muted text-decoration-none">release</a>
 
         </span><br>
-
 
       </div>
     </div>
@@ -246,7 +259,7 @@ SEZNAM MAKER
         <a href="#">Hořlaviny</a>
         <a href="#">Látky podle oddělení</a>
         <a href="#">Hořlaviny</a>
-        <a href="#">Hořlaviny</a>         
+
       </div>
     </div>
   </div>
