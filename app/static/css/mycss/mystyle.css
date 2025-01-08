@@ -1,29 +1,29 @@
 /* ======================================================================
-   VLASTNÍ STYLY (OBSAH)
+   VLASTNÃ STYLY (OBSAH)
    ======================================================================
-   1. Obecné styly
-      1.1 Přepínání režimu (tmavý/světlý)
+   1. ObecnÃ© styly
+      1.1 PÅ™epÃ­nÃ¡nÃ­ reÅ¾imu (tmavÃ½/svÄ›tlÃ½)
    2. Navbar a jeho prvky
-      2.1 Oddělovač
+      2.1 OddÄ›lovaÄ
       2.2 Hover navigace
       2.3 Ikona v navigaci
-   3. Vyhledávací pole
-      3.1 Styl pole na úvodní stránce
+   3. VyhledÃ¡vacÃ­ pole
+      3.1 Styl pole na ÃºvodnÃ­ strÃ¡nce
       3.2 Styl masky
    4. Fonty a velikost textu
-      4.1 Velké písmo
-      4.2 Střední písmo
+      4.1 VelkÃ© pÃ­smo
+      4.2 StÅ™ednÃ­ pÃ­smo
    5. Footer
-   6. Sidebar pro vertikální menu
+   6. Sidebar pro vertikÃ¡lnÃ­ menu
       6.1 Odkazy v menu
       6.2 Hover efekt
-   7. Vyhledávací pole (vnitřní stránky)
+   7. VyhledÃ¡vacÃ­ pole (vnitÅ™nÃ­ strÃ¡nky)
       7.1 Placeholder
-      7.2 Ikona vyhledávače
-      7.3 Dropdown menu návrhů
-   8. Responzivní styly
+      7.2 Ikona vyhledÃ¡vaÄe
+      7.3 Dropdown menu nÃ¡vrhÅ¯
+   8. ResponzivnÃ­ styly
       8.1 Nadpisy
-      8.2 Skrytí prvků na mobilech
+      8.2 SkrytÃ­ prvkÅ¯ na mobilech
    9. Karty
   10. Loader
   11. Accordion
@@ -31,7 +31,7 @@
 ====================================================================== */
 
 /* ======================================================================
-   1. Obecné styly
+   1. ObecnÃ© styly
 ====================================================================== */
 html, body {
   height: 100%;
@@ -48,7 +48,7 @@ footer {
   margin-top: auto;
 }
 
-/* 1.1 Přepínání režimu */
+/* 1.1 PÅ™epÃ­nÃ¡nÃ­ reÅ¾imu */
 body[data-theme='dark'] {
   background-color: #333;
   color: white;
@@ -83,7 +83,7 @@ button:hover {
 }
 
 /* ======================================================================
-   3. Vyhledávací pole
+   3. VyhledÃ¡vacÃ­ pole
 ====================================================================== */
 .form-control-search {
   height: 3rem;
@@ -121,7 +121,7 @@ footer {
 }
 
 /* ======================================================================
-   6. Sidebar pro vertikální menu
+   6. Sidebar pro vertikÃ¡lnÃ­ menu
 ====================================================================== */
 .vertical-menu {
   display: flex;
@@ -143,7 +143,7 @@ footer {
 }
 
 /* ======================================================================
-   7. Vyhledávací pole (vnitřní stránky)
+   7. VyhledÃ¡vacÃ­ pole (vnitÅ™nÃ­ strÃ¡nky)
 ====================================================================== */
 .btn-search {
   height: 2rem;
@@ -166,11 +166,11 @@ footer {
 }
 
 .list-group-item:hover {
-  background-color: #f0f0f0;
+  background-color: #198754;
 }
 
 /* ======================================================================
-   8. Responzivní styly
+   8. Responzivn styly
 ====================================================================== */
 .custom-heading {
   font-size: 5rem;
