@@ -303,3 +303,14 @@ footer {
   color: #6c757d;
   pointer-events: none;
 }
+
+
+#suggestions {
+  max-height: 300px;     /* výška pro cca 10 položek */
+  overflow-y: auto;      /* posuvník */
+}
+
+#resultsList {
+  max-height: 600px;
+  overflow-y: auto;
+}
