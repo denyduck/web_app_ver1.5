@@ -144,7 +144,7 @@ function handleSuggestionsClick(item) {
     pdfModal.show();
     // po zobrazeni modalu napln
     pdfModal._element.addEventListener('shown.bs.modal', function() {
-        pdfIframe.src = `${item.directory}/${item.filename}`;
+        pdfIframe.src = `${item.directory.replace(/\/+$/g, '')}/${item.filename}`;
     });
     // vycisti vse
     clearSuggestions();
@@ -169,7 +169,7 @@ function handleKeyboardNavigation(e) {
         if (focusState.suggestionFocus >= 0 && items[focusState.suggestionFocus]) {
             const selectedItem = items[focusState.suggestionFocus];
             pdfModal.show();
-            pdfIframe.src = `${selectedItem.dataset.directory}/${selectedItem.textContent}`; // Naplní modal
+            pdfIframe.src = `${selectedItem.dataset.directory.replace(/\/+$/g, '')}/${selectedItem.textContent}`; // Naplní modal
             clearSuggestions();
             return;
         }
@@ -234,7 +234,7 @@ function handleResultClick(item) {
     pdfModal.show();
 
     pdfModal._element.addEventListener('shown.bs.modal', function() {
-        pdfIframe.src = `${item.directory}/${item.filename}`;
+        pdfIframe.src = `${item.directory.replace(/\/+$/g, '')}/${item.filename}`;
     });
 
     clearSuggestions();

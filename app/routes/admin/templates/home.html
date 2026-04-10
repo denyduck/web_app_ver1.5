@@ -65,7 +65,7 @@
       <!-- Výsledky hledání -->
       <div id="searchResults" class="mt-4">
         {% if results %}
-          <ul class="list-group">
+          <ul class="list-group" id="search-list" class="overflow-auto" style="max-height: 300px;">
             {% for result in results %}
               <li class="list-group-item">
                 <!-- zobrazení pdf -->

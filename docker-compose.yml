@@ -5,6 +5,7 @@ services:
   db:
     image: mysql:8.0  # Použití oficiálního MySQL obrazu verze 8.0
     container_name: db  # Název kontejneru pro MySQL
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     environment:
       MYSQL_ROOT_PASSWORD: root_password  # Heslo pro root uživatele MySQL
       MYSQL_DATABASE: my_database  # Název databáze, která bude vytvořena
@@ -21,6 +22,7 @@ services:
 # HLAVNÍ APLIKACE
   flask:  # Název služby, která bude provozovat Flask aplikaci
     container_name: web_flask  # Název kontejneru, který bude vytvořen
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     build:  # Definice pro sestavení Docker obrazu
       context: ./app  # Adresář, ve kterém Docker hledá Dockerfile_watchdog a další soubory potřebné pro sestavení
       dockerfile: Dockerfile_flask  # Název Dockerfile_watchdog, který bude použit pro sestavení obrazu
@@ -50,6 +52,7 @@ services:
 # GUNICORN - PYTHON SERVER
   gunicorn:
     container_name: gunicorn  # Název kontejneru pro Gunicorn server
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     build:
       context: ./app  # Adresář pro sestavení obrazu
       dockerfile: Dockerfile_gunicorn  # Název Dockerfile_watchdog pro Gunicorn
@@ -70,6 +73,7 @@ services:
 # REZERVNÍ PROXY - KOMUNIKAC EMEZI SLUŽBAMA
   nginx:
     container_name: nginx  # Název kontejneru pro Nginx
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     build:
       context: ./nginx  # Adresář pro sestavení Nginx obrazu
       dockerfile: Dockerfile_nginx  # Název Dockerfile_watchdog pro Nginx
@@ -88,6 +92,7 @@ services:
   adminer:
     image: adminer  # Použití oficiálního Adminer obrazu pro správu databází
     container_name: adminer  # Název kontejneru pro Adminer
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     ports:
       - "8080:8080"  # Mapování portu 8080 v kontejneru na port 8080 na hostitelském systému
     networks:
@@ -97,6 +102,7 @@ services:
 # HLIDANI ADRESARE
   watch_dog:
     container_name: wdog
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     build:
       context: watch_dog
       dockerfile: Dockerfile_watchdog
@@ -133,6 +139,7 @@ services:
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:management
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     ports:
       - "5672:5672"         # Standardní port pro RabbitMQ
       - "1500:15672"       # host:container
@@ -146,6 +153,7 @@ services:
 
   rebbitmq_consumer:
     container_name: rabbitmq_consumer
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     build:
       context: ./rabbitmq_consumer
       dockerfile: Dockerfile_rabb_consumer
@@ -173,6 +181,7 @@ services:
 # PŘÍRUČKOVÝ MICROSITE
   mkdocs:
     container_name: mkdocs  # Název kontejneru pro MkDocs
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     build:
       context: ./mkdocs  # Adresář pro sestavení obrazu MkDocs
       dockerfile: Dockerfile_mkdocs  # Název Dockerfile_watchdog pro MkDocs
@@ -191,6 +200,7 @@ services:
   plantuml:
     image: plantuml/plantuml-server:v1.2024.5
     container_name: plantuml-server
+    restart: unless-stopped  # Automatický restart při chybě nebo výpadku
     ports:
       - "8081:8080"
    # volumes:
