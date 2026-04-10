@@ -15,6 +15,12 @@ services:
       - "3306:3306"  # Mapování portu 3306 v kontejneru na port 3306 na hostitelském systému
     volumes:
       - ./db_data:/var/lib/mysql  # Persistentní úložiště pro data MySQL, aby byla data uchována i po odstranění kontejneru
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - my_network  # Síť, na které bude služba běžet
 
@@ -43,8 +49,15 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import socket; s=socket.create_connection(('localhost',5000),timeout=2); s.close()\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - my_network  # Síť, na které bude služba běžet
 
@@ -60,8 +73,15 @@ services:
       - ./app:/usr/src/app  # Mapování místního adresáře `./app` do `/usr/src/app` v kontejneru
       - ./shared_models:/usr/src/app/shared_models
 
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import socket; s=socket.create_connection(('localhost',8000),timeout=2); s.close()\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     depends_on:
-      - flask  # Gunicorn závisí na službě `flask`, která musí být spuštěna dříve
+      flask:
+        condition: service_healthy
     command: ["gunicorn", "--bind", "0.0.0.0:8000", "--reload", "run:flask_app"]
     networks:
       - my_network
@@ -84,7 +104,8 @@ services:
       - ./app:/usr/src/app      # mapování adresáře pro přístup static souboru
       - ./pdfs:/usr/src/pdfs    # Mapování adresáře s PDF soubor
     depends_on:
-      - gunicorn  # Nginx závisí na službě `gunicorn`, která musí být spuštěna dříve
+      gunicorn:
+        condition: service_started
     networks:
       - my_network
 
@@ -128,9 +149,12 @@ services:
 
       # aboslutni cesta ka adresari a ujistit se o opravneni pokud bude pouzita
     depends_on:
-      - flask
-      - db
-      - rabbitmq
+      flask:
+        condition: service_started
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - my_network
 
@@ -147,6 +171,12 @@ services:
       RABBITMQ_PLUGINS: "rabbitmq_shovel rabbitmq_shovel_management"
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: password
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - my_network
 
@@ -174,8 +204,10 @@ services:
     networks:
       - my_network
     depends_on:
-      - rabbitmq
-      - db
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
 
 # PŘÍRUČKOVÝ MICROSITE
