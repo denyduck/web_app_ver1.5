@@ -123,7 +123,6 @@ function populateSuggestions(data) {
             suggestionItem.className = 'list-group-item list-group-item-action';    //Ziska tricdu pro ostlovani
             suggestionItem.textContent = item.filename;     //nastavi textovy obsah ktery se ma zobrazit
             suggestionItem.dataset.directory = item.directory; // ulozi se do datoveho atributu dataset.directory
-            suggestions.appendChild(suggestionItem);
 
             //pridani posluchace kliknuti pro otevreni PDF Modalu
             suggestionItem.addEventListener('click', () => handleSuggestionsClick(item));  //kazd ynavrh dostane posluchace kliknuti, kdyz se klikne na navrh zavolase fce handle...
